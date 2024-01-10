@@ -1,0 +1,63 @@
+if we have root access in windows we can change the default application to open a file extension (change application to malicious exe or hook notepad)
+
+xorstr for string obfuscation
+
+pack dll with themedia or vmp
+
+make sure that hardware breakpoints are detected
+
+thread that walks through the directories to find encrypted dll on the os
+
+api hashing / obfuscation - hells gate
+IAT hooking
+
+constexpr to use hash string functions to avoid plain text in binary
+
+dynamic code creation / polymorphism
+
+if possible give UAC prompt asking for admin, this will change methods of injection depending on the response to the request
+
+if we can write in C:\Windows we can hijack most of the DLLs that explorer.exe loads, onedrive can be used for userland persistence
+
+extension of an exe can be changed to png, placed in a hidden folder, create a shortcut of this file then in the run properties put minimized and cmd.exe
+/c before the name in the target to hide, change the icon
+
+change exe metadata including compilation timestamp
+
+implement steganography of the dlls, with a multi stage attack
+
+	ideas for staging given by chatgpt
+
+				Reflective DLL Injection:
+
+			Use a reflective DLL loader to inject a reflective DLL into the memory space of a legitimate process.
+			Thread Execution Hijacking:
+
+			Identify a low-visibility thread within the target process, such as a background or utility thread.
+			Memory Module:
+
+			Load a secondary DLL directly from memory into the target process without touching the disk.
+			Steganography:
+
+			Conceal the reflective DLL within a seemingly innocuous file, such as a benign image or document. This file acts as a carrier for the malicious payload.
+			Code Cave Injection:
+
+			Identify a suitable code cave within the target process to inject additional code. This code cave will be used for executing the reflective DLL loader.
+			IAT Hooking:
+
+			Once the reflective DLL is loaded, perform IAT hooking to intercept and redirect calls to essential functions. This can help in evading static analysis.
+			Manual Mapping:
+
+			Manually map another DLL into the target process, carefully resolving dependencies and ensuring stealthy injection.
+			Execution Flow:
+
+			Start by executing a loader program that uses steganography to embed the reflective DLL within the carrier file.
+			Launch the loader, which loads the carrier file into the memory of the target process.
+			Use the code cave injection technique to inject code into the target process, which then hijacks a low-visibility thread.
+			The hijacked thread executes code that loads the reflective DLL from memory.
+			Once loaded, the reflective DLL establishes persistence and carries out IAT-hooked activities.
+			Perform manual mapping to inject another DLL, leveraging a carefully crafted injection process to avoid detection.
+
+using windows api we can manually move the mouse on the screen to click yes on a UAC prompt
+
+make the dll loaded by the injector run thread to unpack a binary which will then decrypt functions located in the same dll and use them 
