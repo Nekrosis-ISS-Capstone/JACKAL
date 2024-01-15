@@ -30,8 +30,6 @@ const API_ACCESS& APIResolver::GetAPIAccess() const {
 // This function will resolve all of the functions in our API_FUNCTIONS struct
 void APIResolver::ResolveFunctions(API_MODULES hModuleHandle)
 {
-
-
 	API_FUNCTIONS api;
 	Tools tools;
 
@@ -41,26 +39,28 @@ void APIResolver::ResolveFunctions(API_MODULES hModuleHandle)
 	uintptr_t pFunctionsResolved[] = {0};
 	int  nFunctionsResolved        =  0;
 
-	// Iterate through the function pointers in the struct
-	for (int i = 0; i < numFunctions; ++i)
-	{ 
-		// Get the function pointer at index i
-		void *pFunc = *reinterpret_cast<PVOID*>((reinterpret_cast<char*>(&api) + i * sizeof(void*)));
+    for (int i = 0; i < sizeof(this->api.mod) / sizeof(HMODULE); i++)
+    {
+        // Iterate through the function pointers in the struct
+        for (int i = 0; i < numFunctions; ++i)
+        {
+            // Get the function pointer at index i
+            void* pFunc = *reinterpret_cast<PVOID*>((reinterpret_cast<char*>(&api) + i * sizeof(void*)));
 
-		// Resolve the function address
-		auto resolvedFunc = GetProcessAddress(hNtdll, reinterpret_cast<const char*>(pFunc));
+            // Resolve the function address
+            auto resolvedFunc = GetProcessAddress(this->api.mod.Ntdll, reinterpret_cast<const char*>(pFunc));
 
-		if (!resolvedFunc)
-		{
-			// Handle the case where a function is not found
-			tools.ShowError("Failed to find function");
-			exit(-1);
-		}
-		nFunctionsResolved++;
-		pFunctionsResolved[i] = resolvedFunc;
-		// Now 'resolvedFunc' contains the address of the function, you can use it as needed
-	}
-	
+            if (!resolvedFunc)
+            {
+                // Handle the case where a function is not found
+                tools.ShowError("Failed to find function");
+                exit(-1);
+            }
+            nFunctionsResolved++;
+            pFunctionsResolved[i] = resolvedFunc;
+            // Now 'resolvedFunc' contains the address of the function, you can use it as needed
+        }
+    }
 	tools.ShowError("number of functions resolved: ", nFunctionsResolved );
 
 }
