@@ -1,5 +1,7 @@
 #pragma once
 #include <Windows.h>
+#include <string>
+
 
 class Tools
 {
@@ -11,4 +13,5 @@ public:
 	void DisplayMessage(const char *message, ...);
 
 	void EnableDebugConsole();
+	consteval std::string XorStr(std::string input);
 }; 

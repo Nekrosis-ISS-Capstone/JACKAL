@@ -1,5 +1,4 @@
 #include "../headers/Tools.h"
-#include <string>
 
 void Tools::ShowError(const char* error)
 {
@@ -45,3 +44,13 @@ void Tools::EnableDebugConsole()
     }
 }
 
+consteval std::string Tools::XorStr(std::string input)
+{   
+    unsigned key = 0x16af35;
+    std::string result = input;
+    for (char& character : result)
+    {
+        character ^= key;
+    }
+    return result;
+}

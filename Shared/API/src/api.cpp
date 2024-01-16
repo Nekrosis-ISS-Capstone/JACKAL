@@ -33,11 +33,20 @@ void APIResolver::ResolveFunctions(API_MODULES hModuleHandle)
 {
 	/*API_FUNCTIONS api;*/
 	Tools tools;
+    std::string name = "NtQueryInformationProcess";
 
 	// Get the number of function pointers in the struct
 	size_t numFunctions = sizeof(API_FUNCTIONS) / sizeof(PVOID);
 
-    tools.ShowError("numfunc: ", numFunctions);
+    tools.ShowError("Number of functions: ", numFunctions);
+
+    API_T ApiList[]
+    {
+        {tools.XorStr(name)},
+        {},
+        {},
+    };
+
 
     // we have to recreate this functionality
     api.func.pNtQueryInformationProcess = reinterpret_cast<pNtQueryInformationProcess_t>(GetProcessAddress(this->api.mod.Ntdll, "NtQueryInformationProcess"));
@@ -75,7 +84,6 @@ void APIResolver::ResolveFunctions(API_MODULES hModuleHandle)
 
 void APIResolver::LoadModules()
 {
-    API_MODULES modules;
     Tools tools;
 
     api.mod.Kernel32 = LoadLibraryA("kernel32.dll");
@@ -99,7 +107,8 @@ void APIResolver::FreeModules()
 // END API_INIT CLASS
 
 
-// Instead of using windows.h for these structures we should define them ourselves by creating custom_ntdll.h with only structure definitions with their dependancies 
+
+// Custom GetProcAddress implementation to avoid usage of winapi functions
 uintptr_t API::GetProcessAddress(void *pBase, LPCSTR szFunc)
 {
 

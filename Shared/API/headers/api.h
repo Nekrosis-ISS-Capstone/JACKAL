@@ -1,10 +1,18 @@
 #pragma once
 #include <Windows.h>
 #include "API/headers/ntdll_functions.h"
+#include <string>
 
 //#include "../API/ntdll.h"
 namespace API
 {
+	typedef struct
+	{
+		std::string	 FunctionHash;
+		HMODULE* Module;
+		LPVOID*  Function;
+	} API_T;
+
 	typedef struct API_MODULES
 	{
 		// We will have a function to get handles to these modules via their hashed value 
