@@ -20,32 +20,21 @@ namespace API
 		// We need functionality to ensure the addresses of these function pointers are resolved via api hashing
 
 		/* NTDLL */
-		ptNtQueryInformationProcess_t ptNtQueryInformationProcess;
+		pNtQueryInformationProcess_t pNtQueryInformationProcess;
+		pNtCreateProcess_t			 pNtCreateProcess;
+		pNtTerminateProcess_t		 pNtTerminateProcess;
+		pNtCreateThread_t			 pNtCreateThread;
+		pLdrLoadDll_t				 pLdrLoadDll;
 
 	}API_FUNCTIONS;
 
 	typedef struct API_ACCESS
 	{
-		//API_INIT init;
-
 		API_MODULES   mod;
 		API_FUNCTIONS func;
 
 
 	}API_ACCESS;
-	//typedef struct API_MODULE
-	//{
-	//	DWORD	 ModuleHash;
-	//	HMODULE* Module;
-	//} API_MODULE;
-
-	//typedef struct API_T
-	//{
-	//	//DWORD	 FunctionHash;
-	//	HMODULE* Module;
-	//	LPVOID* Function;
-	//} API_T;
-
 
 	uintptr_t GetProcessAddress(void* pBase, LPCSTR szFunc);
 
@@ -55,13 +44,12 @@ namespace API
 		APIResolver();
 		~APIResolver();
 		
-		API_MODULES FreeModules();
+		void FreeModules();
 		const API_ACCESS& GetAPIAccess() const;
 	private:
 
-
-		API_MODULES LoadModules();
-		void ResolveFunctions(API_MODULES hModuleHandle);
+		void LoadModules();
+		void ResolveFunctions(API_MODULES pModules);
 
 		API_ACCESS api;
 	};

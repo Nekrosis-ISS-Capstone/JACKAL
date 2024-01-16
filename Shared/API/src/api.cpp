@@ -3,7 +3,6 @@
 
 #include "../headers/api.h"
 #include "utils/headers/Tools.h"
-//#include "API/headers/ntdll.h"
 #include <string>
 #include <sstream>
 
@@ -14,7 +13,8 @@ using namespace API;
 
 APIResolver::APIResolver()
 {
-    api.mod = this->LoadModules();
+    //API_ACCESS api = GetAPIAccess();
+    this->LoadModules();
     this->ResolveFunctions(api.mod);
 }
 APIResolver::~APIResolver()
@@ -23,49 +23,57 @@ APIResolver::~APIResolver()
 }
 
 
-const API_ACCESS& APIResolver::GetAPIAccess() const {
+const API_ACCESS& APIResolver::GetAPIAccess() const 
+{
     return api;
 }
 
 // This function will resolve all of the functions in our API_FUNCTIONS struct
 void APIResolver::ResolveFunctions(API_MODULES hModuleHandle)
 {
-	API_FUNCTIONS api;
+	/*API_FUNCTIONS api;*/
 	Tools tools;
 
 	// Get the number of function pointers in the struct
 	size_t numFunctions = sizeof(API_FUNCTIONS) / sizeof(PVOID);
 
-	uintptr_t pFunctionsResolved[] = {0};
-	int  nFunctionsResolved        =  0;
+    tools.ShowError("numfunc: ", numFunctions);
 
-    for (int i = 0; i < sizeof(this->api.mod) / sizeof(HMODULE); i++)
-    {
-        // Iterate through the function pointers in the struct
-        for (int i = 0; i < numFunctions; ++i)
-        {
-            // Get the function pointer at index i
-            void* pFunc = *reinterpret_cast<PVOID*>((reinterpret_cast<char*>(&api) + i * sizeof(void*)));
+    // we have to recreate this functionality
+    api.func.pNtQueryInformationProcess = reinterpret_cast<pNtQueryInformationProcess_t>(GetProcessAddress(this->api.mod.Ntdll, "NtQueryInformationProcess"));
 
-            // Resolve the function address
-            auto resolvedFunc = GetProcessAddress(this->api.mod.Ntdll, reinterpret_cast<const char*>(pFunc));
+    
 
-            if (!resolvedFunc)
-            {
-                // Handle the case where a function is not found
-                tools.ShowError("Failed to find function");
-                exit(-1);
-            }
-            nFunctionsResolved++;
-            pFunctionsResolved[i] = resolvedFunc;
-            // Now 'resolvedFunc' contains the address of the function, you can use it as needed
-        }
-    }
-	tools.ShowError("number of functions resolved: ", nFunctionsResolved );
+	//uintptr_t pFunctionsResolved[] = {0};
+	//int  nFunctionsResolved        =  0;
+
+ //   for (int i = 0; i < sizeof(this->api.mod) / sizeof(HMODULE); i++)
+ //   {
+ //       // Iterate through the function pointers in the struct
+ //       for (int i = 0; i < numFunctions; ++i)
+ //       {
+ //           // Get the function pointer at index i
+ //           void* pFunc = *reinterpret_cast<PVOID*>((reinterpret_cast<char*>(&this->api.func) + i * sizeof(void*)));
+
+ //           // Resolve the function address
+ //           auto resolvedFunc = GetProcessAddress(this->api.mod.Ntdll, reinterpret_cast<const char*>(pFunc));
+
+ //           if (!resolvedFunc)
+ //           {
+ //               // Handle the case where a function is not found
+ //               tools.ShowError("Failed to find function");
+ //               exit(-1);
+ //           }
+ //           nFunctionsResolved++;
+ //           pFunctionsResolved[i] = resolvedFunc;
+ //           // Now 'resolvedFunc' contains the address of the function, you can use it as needed
+ //       }
+ //   }
+	//tools.ShowError("number of functions resolved: ", nFunctionsResolved );
 
 }
 
-API_MODULES APIResolver::LoadModules()
+void APIResolver::LoadModules()
 {
     API_MODULES modules;
     Tools tools;
@@ -74,26 +82,18 @@ API_MODULES APIResolver::LoadModules()
     api.mod.Ntdll    = LoadLibraryA("ntdll.dll");
 
     if (!api.mod.Kernel32) 
-    {
         tools.ShowError("Failed to get handle to kernel32");
-        return modules;
-    }
     if (!api.mod.Ntdll) 
-    {
         tools.ShowError("Failed to get handle to Ntdll");
-        return modules;
-    }
-    return modules;
 }
 
 
-API_MODULES APIResolver::FreeModules()
+void APIResolver::FreeModules()
 {
     if (api.mod.Kernel32)
         FreeLibrary(api.mod.Kernel32);
     if (api.mod.Ntdll)
         FreeLibrary(api.mod.Ntdll);
-
 }
 
 // END API_INIT CLASS

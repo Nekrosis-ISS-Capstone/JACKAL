@@ -5,9 +5,9 @@
 
 class AntiAnalysis
 {
-	bool Peb();
+	bool Peb(API::APIResolver& resolver);
 
 public:
-	bool PebCheck(/*DWORD64& nStartTime*/);
+	bool PebCheck(API::APIResolver& resolver);
 
 };
