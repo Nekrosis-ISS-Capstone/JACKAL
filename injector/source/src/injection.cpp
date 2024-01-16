@@ -241,10 +241,7 @@ void __stdcall Shellcode(MANUAL_MAPPING_DATA* pData)
 			{
 				
 				if (IMAGE_SNAP_BY_ORDINAL(*pThunkRef))
-				{
 					*pFuncRef = _GetProcAddress(hDll, reinterpret_cast<char*>(*pThunkRef & 0xFFFF)); // Take the lower two bytes of pThunkRef to get the ordinal number of the function
-
-				}
 				else
 				{
 					auto* pImport = reinterpret_cast<IMAGE_IMPORT_BY_NAME*>(pBase + (*pThunkRef));

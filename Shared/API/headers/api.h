@@ -8,7 +8,7 @@ namespace API
 {
 	typedef struct
 	{
-		std::string	 FunctionHash;
+		size_t	 FunctionHash;
 		HMODULE* Module;
 		LPVOID*  Function;
 	} API_T;
@@ -45,6 +45,7 @@ namespace API
 	}API_ACCESS;
 
 	uintptr_t GetProcessAddress(void* pBase, LPCSTR szFunc);
+	uintptr_t GetProcessAddress(void* pBase, size_t szFunc);
 
 	class APIResolver
 	{

@@ -1,4 +1,5 @@
 #include "../headers/Tools.h"
+#include <functional>
 
 void Tools::ShowError(const char* error)
 {
@@ -32,7 +33,7 @@ void Tools::DisplayMessage(const char *format, ...)
 
 void Tools::EnableDebugConsole()
 {
-    if (AllocConsole)
+    if (AllocConsole())
     {
         FILE* fpStdout = stdout;
         FILE* fpStdin  = stdin;
@@ -44,13 +45,14 @@ void Tools::EnableDebugConsole()
     }
 }
 
-consteval std::string Tools::XorStr(std::string input)
-{   
-    unsigned key = 0x16af35;
-    std::string result = input;
-    for (char& character : result)
-    {
-        character ^= key;
-    }
-    return result;
+// This function is used to get the hashes of 
+consteval size_t Tools::EarlyHash(const char* str, size_t h)
+{
+    return (*str == 0) ? h : EarlyHash(str + 1, (h ^ *str) * 1099511628211ull);
+}
+
+// This function is used to get the hashes of 
+size_t Tools::LateHash(const char* str, size_t h)
+{
+    return (*str == 0) ? h : LateHash(str + 1, (h ^ *str) * 1099511628211ull);
 }
