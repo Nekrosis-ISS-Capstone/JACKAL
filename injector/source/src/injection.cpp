@@ -123,7 +123,7 @@ bool ManualMap(HANDLE hProc, const char* szDllFile)
 
 	MANUAL_MAPPING_DATA    data{ 0 };
 	data.pLoadLibraryA	 = LoadLibraryA;
-	data.pGetProcAddress = reinterpret_cast<f_GetProcAddress>(GetProcAddress);
+	data.pGetProcAddress = reinterpret_cast<f_GetProcAddress>(GetProcAddress); // TODO: Use custom getprocaddress implementation 
 
 	IMAGE_SECTION_HEADER* pSectionHeader = IMAGE_FIRST_SECTION(pOldNtHeader); // Points directly to the section after the optional header
 	for (UINT i = 0; i != pOldFileHeader->NumberOfSections; ++i, ++pSectionHeader)

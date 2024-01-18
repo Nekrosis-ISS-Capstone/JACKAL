@@ -10,13 +10,12 @@
 const char *szDllFile = "C:\\Users\\scott\\Documents\\GitHub\\sample\\bin\\x64\\Release\\dll.dll";
 const char *szProc    = "injector.exe";
 
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-    API::APIResolver  resolver;
-    AntiAnalysis      debug;
-    Tools             tools;
-    PROCESSENTRY32    PE32{0};
+    API::APIResolver  resolver; // Load modules anf functions by their hashes 
+    AntiAnalysis      debug;    // Debug and sandbox checking
+    Tools             tools;    // Used for error reporting
+    PROCESSENTRY32    PE32{0};  // Used for getting information about processes
     PE32.dwSize =     sizeof(PE32);
 
 
@@ -35,6 +34,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     BOOL bRet = Process32First(hSnap, &PE32);
     DWORD PID = 0;
 
+    // Find the process that we want to manual map into
     while (bRet)
     {
         if (!strcmp(szProc, (const char *)PE32.szExeFile))
@@ -47,7 +47,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     CloseHandle(hSnap);
 
-    HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS, FALSE, PID);
+    HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS, FALSE, PID); // Get a handle to the process
 
     if (!hProc)
     {
@@ -55,6 +55,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         return 0;
     }
 
+    // Inject into the process
     if (!ManualMap(hProc, szDllFile))
     {
         tools.ShowError("Somethings fucked");

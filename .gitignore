@@ -46,3 +46,7 @@
 *.ilk
 *.idb
 injector/source/headers/dll.h
+*.txt
+*.sarif
+*.lastcodeanalysissucceeded
+*.xml

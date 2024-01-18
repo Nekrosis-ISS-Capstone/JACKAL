@@ -15,6 +15,7 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)API\headers\crc.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)API\headers\custom_ntdll.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)API\headers\ntdll.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)API\headers\ntdll_functions.h" />

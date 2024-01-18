@@ -1,7 +1,6 @@
 #pragma once
 #include <Windows.h>
 #include "API/headers/ntdll_functions.h"
-#include <string>
 
 //#include "../API/ntdll.h"
 namespace API
@@ -25,7 +24,7 @@ namespace API
 	// API_FUNCTIONS defines the function pointer variables of function types defined in *_functions.h
 	typedef struct API_FUNCTIONS
 	{
-		// We need functionality to ensure the addresses of these function pointers are resolved via api hashing
+		//These function pointers will be resolved via API hashing 
 
 		/* NTDLL */
 		pNtQueryInformationProcess_t pNtQueryInformationProcess;
@@ -36,16 +35,17 @@ namespace API
 
 	}API_FUNCTIONS;
 
+	// This struct will be globally accessible through the class object make accessible publicly through APIResolver::GetAPIAccess()
 	typedef struct API_ACCESS
 	{
 		API_MODULES   mod;
 		API_FUNCTIONS func;
 
-
 	}API_ACCESS;
 
-	uintptr_t GetProcessAddress(void* pBase, LPCSTR szFunc);
-	uintptr_t GetProcessAddress(void* pBase, size_t szFunc);
+	// Functions to get a function address by name and one to get by hash
+	uintptr_t GetProcessAddress		 (void* pBase, LPCSTR szFunc); 
+	uintptr_t GetProcessAddressByHash(void* pBase, size_t szFunc); 
 
 	class APIResolver
 	{
