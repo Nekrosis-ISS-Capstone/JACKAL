@@ -50,3 +50,5 @@ injector/source/headers/dll.h
 *.sarif
 *.lastcodeanalysissucceeded
 *.xml
+capstone ideas.txt
+malware development.txt
