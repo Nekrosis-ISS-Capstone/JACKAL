@@ -45,7 +45,7 @@ namespace API
 
 	// Functions to get a function address by name and one to get by hash
 	uintptr_t GetProcessAddress		 (void* pBase, LPCSTR szFunc); 
-	uintptr_t GetProcessAddressByHash(void* pBase, size_t szFunc); 
+	uintptr_t GetProcessAddressByHash(void* pBase, size_t func, LPCSTR szFunc); 
 
 	class APIResolver
 	{

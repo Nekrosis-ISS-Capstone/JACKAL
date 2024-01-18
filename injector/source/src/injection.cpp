@@ -30,21 +30,21 @@ bool ManualMap(HANDLE hProc, const char* szDllFile)
 		return 0;
 	}
 
-	std::ifstream File(szDllFile, std::ios::binary | std::ios::ate); // Opening dll for read
+	std::ifstream file(szDllFile, std::ios::binary | std::ios::ate); // Opening dll for read
 
-	if (File.fail())
+	if (file.fail())
 	{ 
-		tools.ShowError("Failed to open ifstream", (int)File.rdstate());
-		File.close();
+		tools.ShowError("Failed to open ifstream", (int)file.rdstate());
+		file.close();
 		return 0;
 	}
 
-	auto FileSize = File.tellg(); // Get file size
+	auto FileSize = file.tellg(); // Get file size
 	
 	if (FileSize < 0x1000)
 	{
 		tools.ShowError("Filesize invalid");
-		File.close();
+		file.close();
 		return 0;
 	}
 
@@ -53,14 +53,14 @@ bool ManualMap(HANDLE hProc, const char* szDllFile)
 	if (!pSrcData)
 	{
 		tools.ShowError("Internal Memory Allocation Failed");
-		File.close();
+		file.close();
 		return 0;
 	}
 
 	// Write the byte array into memory
-	File.seekg(0, std::ios::beg);
-	File.read(reinterpret_cast<char*>(pSrcData), FileSize);
-	File.close();
+	file.seekg(0, std::ios::beg);
+	file.read(reinterpret_cast<char*>(pSrcData), FileSize);
+	file.close();
 
 	// Check the magic number
 	if (reinterpret_cast<IMAGE_DOS_HEADER*>(pSrcData)->e_magic != 0x5A4D)

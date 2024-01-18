@@ -56,7 +56,8 @@ void APIResolver::ResolveFunctions(API_MODULES hModuleHandle)
     tools.ShowError("dynamic function hash: ", CRC32_STR_RUN("NtQueryInformationProcess"));
 
     // we have to recreate this functionality
-    api.func.pNtQueryInformationProcess = reinterpret_cast<pNtQueryInformationProcess_t>(GetProcessAddressByHash(this->api.mod.Ntdll, hashes::function));
+    api.func.pNtQueryInformationProcess = reinterpret_cast<pNtQueryInformationProcess_t>(GetProcessAddressByHash(this->api.mod.Ntdll, hashes::function, "NtQueryInformationProcess"));
+    //api.func.pNtQueryInformationProcess = reinterpret_cast<pNtQueryInformationProcess_t>(GetProcessAddress(this->api.mod.Ntdll, "NtQueryInformationProcess"));
 
     
 
@@ -189,21 +190,21 @@ uintptr_t API::GetProcessAddress(void *pBase, LPCSTR szFunc)
     return NULL;
 }
 
-uintptr_t API::GetProcessAddressByHash(void* pBase, size_t func)
+uintptr_t API::GetProcessAddressByHash(void* pBase, size_t func, LPCSTR szFunc)
 {
 
     unsigned char* pBaseAddr = reinterpret_cast<unsigned char*>(pBase);
 
     Tools tools; // For error reporting functionality
 
-    PIMAGE_DOS_HEADER       pDosHeader = nullptr;
-    PIMAGE_NT_HEADERS       pNtHeaders = nullptr;
+    PIMAGE_DOS_HEADER       pDosHeader  = nullptr;
+    PIMAGE_NT_HEADERS       pNtHeaders  = nullptr;
     PIMAGE_FILE_HEADER      pFileHeader = nullptr;
-    PIMAGE_OPTIONAL_HEADER  pOptHeader = nullptr;
-    PIMAGE_EXPORT_DIRECTORY pExportDir = nullptr;
+    PIMAGE_OPTIONAL_HEADER  pOptHeader  = nullptr;
+    PIMAGE_EXPORT_DIRECTORY pExportDir  = nullptr;
 
     DWORD exports_size = NULL;
-    DWORD exports_rva = NULL;
+    DWORD exports_rva  = NULL;
 
     // Get DOS header
     pDosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(pBaseAddr);
@@ -255,7 +256,16 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, size_t func)
     for (unsigned int i = 0; i < pExportDir->NumberOfNames; ++i)
     {
         char* szNames = reinterpret_cast<char*>(pBaseAddr + reinterpret_cast<unsigned long*>(pBaseAddr + pExportDir->AddressOfNames)[i]);
-        tools.DisplayMessage(szNames);
+
+        if (!strcmp(szNames, szFunc))
+        {
+            auto hash = CRC32_STR_RUN(szNames);
+            tools.DisplayMessage(szNames);
+            tools.ShowError("hash now: ", (size_t)hash);
+            tools.ShowError("initial hash: ", (size_t)hashes::function);
+        }
+        
+        
         if (CRC32_STR_RUN(szNames) == func)
         {
             unsigned short usOrdinal = reinterpret_cast<unsigned short*>(pBaseAddr + pExportDir->AddressOfNameOrdinals)[i];
