@@ -52,41 +52,39 @@ void APIResolver::ResolveFunctions(API_MODULES hModuleHandle)
         {},
     };
 
-    //tools.ShowError("compile time function hash: ", hashes::function);
-    //tools.ShowError("run time function hash: ", CRC32_STR_RUN("NtQueryInformationProcess"));
 
     // we have to recreate this functionality
-    api.func.pNtQueryInformationProcess = reinterpret_cast<pNtQueryInformationProcess_t>(GetProcessAddressByHash(this->api.mod.Ntdll, hashes::function, "NtQueryInformationProcess"));
-    //api.func.pNtQueryInformationProcess = reinterpret_cast<pNtQueryInformationProcess_t>(GetProcessAddress(this->api.mod.Ntdll, "NtQueryInformationProcess"));
+    //api.func.pNtQueryInformationProcess = reinterpret_cast<pNtQueryInformationProcess_t>(GetProcessAddressByHash(this->api.mod.Ntdll, hashes::function, "NtQueryInformationProcess"));
+    api.func.pNtQueryInformationProcess = reinterpret_cast<pNtQueryInformationProcess_t>(GetProcessAddress(this->api.mod.Ntdll, "NtQueryInformationProcess"));
 
     
 
-	//uintptr_t pFunctionsResolved[] = {0};
-	//int  nFunctionsResolved        =  0;
+	uintptr_t pFunctionsResolved[] = {0};
+	int  nFunctionsResolved        =  0;
 
- //   for (int i = 0; i < sizeof(this->api.mod) / sizeof(HMODULE); i++)
- //   {
- //       // Iterate through the function pointers in the struct
- //       for (int i = 0; i < numFunctions; ++i)
- //       {
- //           // Get the function pointer at index i
- //           void* pFunc = *reinterpret_cast<PVOID*>((reinterpret_cast<char*>(&this->api.func) + i * sizeof(void*)));
+    for (int i = 0; i < sizeof(this->api.mod) / sizeof(HMODULE); i++)
+    {
+        // Iterate through the function pointers in the struct
+        for (int i = 0; i < numFunctions; ++i)
+        {
+            // Get the function pointer at index i
+            void* pFunc = *reinterpret_cast<PVOID*>((reinterpret_cast<char*>(&this->api.func) + i * sizeof(void*)));
 
- //           // Resolve the function address
- //           auto resolvedFunc = GetProcessAddress(this->api.mod.Ntdll, reinterpret_cast<const char*>(pFunc));
+            // Resolve the function address
+            auto resolvedFunc = GetProcessAddress(this->api.mod.Ntdll, reinterpret_cast<const char*>(pFunc));
 
- //           if (!resolvedFunc)
- //           {
- //               // Handle the case where a function is not found
- //               tools.ShowError("Failed to find function");
- //               exit(-1);
- //           }
- //           nFunctionsResolved++;
- //           pFunctionsResolved[i] = resolvedFunc;
- //           // Now 'resolvedFunc' contains the address of the function, you can use it as needed
- //       }
- //   }
-	//tools.ShowError("number of functions resolved: ", nFunctionsResolved );
+            if (!resolvedFunc)
+            {
+                // Handle the case where a function is not found
+                tools.ShowError("Failed to find function");
+                return;
+            }
+            nFunctionsResolved++;
+            pFunctionsResolved[i] = resolvedFunc;
+            // Now 'resolvedFunc' contains the address of the function, you can use it as needed
+        }
+    }
+	tools.ShowError("number of functions resolved: ", nFunctionsResolved );
 
 }
 
@@ -260,8 +258,6 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, size_t func, LPCSTR szFunc)
     {
         char* szNames = reinterpret_cast<char*>(pBaseAddr + reinterpret_cast<unsigned long*>(pBaseAddr + pExportDir->AddressOfNames)[i]);
 
-        checker(szNames, pExportDir->NumberOfNames);
-
         if (!strcmp(szNames, szFunc))
         {
             
@@ -275,14 +271,4 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, size_t func, LPCSTR szFunc)
     }
 
     return NULL;
-}
-
-static Tools tools;
-
-static void checker(char *name, DWORD numbernames)
-{
-    if (!strcmp(name, "NtQueryInformationProcess"))
-    {
-        tools.DisplayMessage("found NtQueryInformationProcess");
-    }
 }
