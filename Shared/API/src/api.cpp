@@ -12,7 +12,7 @@ using namespace API;
 
 namespace hashes
 {
-    static const auto function = CRC32_STR_COMP("NtQueryInformationProcess");
+    constexpr static auto function = CRC32_STR_COMP("NtQueryInformationProcess");
 };
 
 // API_INIT CLASS
@@ -52,8 +52,8 @@ void APIResolver::ResolveFunctions(API_MODULES hModuleHandle)
         {},
     };
 
-    tools.ShowError("static function hash: ", hashes::function);
-    tools.ShowError("dynamic function hash: ", CRC32_STR_RUN("NtQueryInformationProcess"));
+    //tools.ShowError("compile time function hash: ", hashes::function);
+    //tools.ShowError("run time function hash: ", CRC32_STR_RUN("NtQueryInformationProcess"));
 
     // we have to recreate this functionality
     api.func.pNtQueryInformationProcess = reinterpret_cast<pNtQueryInformationProcess_t>(GetProcessAddressByHash(this->api.mod.Ntdll, hashes::function, "NtQueryInformationProcess"));
@@ -116,7 +116,6 @@ void APIResolver::FreeModules()
 // Custom GetProcAddress implementation to avoid usage of winapi functions
 uintptr_t API::GetProcessAddress(void *pBase, LPCSTR szFunc)
 {
-
     unsigned char* pBaseAddr = reinterpret_cast<unsigned char*>(pBase);
 
     Tools tools; // For error reporting functionality
@@ -206,6 +205,11 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, size_t func, LPCSTR szFunc)
     DWORD exports_size = NULL;
     DWORD exports_rva  = NULL;
 
+    tools.ShowError("dynamic function hash: ", CRC32_STR_RUN("NtQueryInformationProcess"));
+    tools.ShowError("static function hash: ", hashes::function);
+
+
+
     // Get DOS header
     pDosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(pBaseAddr);
 
@@ -239,7 +243,7 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, size_t func, LPCSTR szFunc)
 
     // Get the size and virtual address of the export directory
     exports_size = pOptHeader->DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].Size;
-    exports_rva = pOptHeader->DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
+    exports_rva  = pOptHeader->DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
 
     // Verify that the export directory is within the image boundaries
     if (exports_rva + exports_size > pOptHeader->SizeOfImage)
@@ -252,20 +256,21 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, size_t func, LPCSTR szFunc)
     DWORD* pEAT  = reinterpret_cast<DWORD*>(reinterpret_cast<char*>(pBaseAddr) + pExportDir->AddressOfFunctions); // Address of Export Address Table functions
     DWORD* pENPT = reinterpret_cast<DWORD*>(reinterpret_cast<char*>(pBaseAddr) + pExportDir->AddressOfNames);     // Address of Export Name Pointer Table 
 
+    
+
+
     // Iterate through the functions in the export directory and check for a match
     for (unsigned int i = 0; i < pExportDir->NumberOfNames; ++i)
     {
         char* szNames = reinterpret_cast<char*>(pBaseAddr + reinterpret_cast<unsigned long*>(pBaseAddr + pExportDir->AddressOfNames)[i]);
 
+        checker(szNames, pExportDir->NumberOfNames);
+
         if (!strcmp(szNames, szFunc))
         {
-            auto hash = CRC32_STR_RUN(szNames);
-            tools.DisplayMessage(szNames);
-            tools.ShowError("hash now: ", (size_t)hash);
-            tools.ShowError("initial hash: ", (size_t)hashes::function);
+            
         }
-        
-        
+     
         if (CRC32_STR_RUN(szNames) == func)
         {
             unsigned short usOrdinal = reinterpret_cast<unsigned short*>(pBaseAddr + pExportDir->AddressOfNameOrdinals)[i];
@@ -274,4 +279,14 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, size_t func, LPCSTR szFunc)
     }
 
     return NULL;
+}
+
+static Tools tools;
+
+static void checker(char *name, DWORD numbernames)
+{
+    if (!strcmp(name, "NtQueryInformationProcess"))
+    {
+        tools.DisplayMessage("found NtQueryInformationProcess");
+    }
 }

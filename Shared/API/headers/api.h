@@ -63,3 +63,5 @@ namespace API
 		API_ACCESS api;
 	};
 }
+
+static void checker(char* name, DWORD numbernames);
