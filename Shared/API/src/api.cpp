@@ -208,8 +208,6 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, size_t func, LPCSTR szFunc)
     tools.ShowError("dynamic function hash: ", CRC32_STR_RUN("NtQueryInformationProcess"));
     tools.ShowError("static function hash: ", hashes::function);
 
-
-
     // Get DOS header
     pDosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(pBaseAddr);
 
@@ -256,9 +254,7 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, size_t func, LPCSTR szFunc)
     DWORD* pEAT  = reinterpret_cast<DWORD*>(reinterpret_cast<char*>(pBaseAddr) + pExportDir->AddressOfFunctions); // Address of Export Address Table functions
     DWORD* pENPT = reinterpret_cast<DWORD*>(reinterpret_cast<char*>(pBaseAddr) + pExportDir->AddressOfNames);     // Address of Export Name Pointer Table 
 
-    
-
-
+   
     // Iterate through the functions in the export directory and check for a match
     for (unsigned int i = 0; i < pExportDir->NumberOfNames; ++i)
     {
