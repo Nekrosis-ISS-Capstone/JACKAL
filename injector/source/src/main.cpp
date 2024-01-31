@@ -14,7 +14,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 {
     API::APIResolver  resolver; // Load modules anf functions by their hashes 
     AntiAnalysis      debug;    // Debug and sandbox checking
-    Tools             tools;    // Used for error reporting
+    Logging             tools;    // Used for error reporting
     PROCESSENTRY32    PE32{0};  // Used for getting information about processes
     PE32.dwSize =     sizeof(PE32);
 

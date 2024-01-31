@@ -24,8 +24,6 @@ namespace API
 	// API_FUNCTIONS defines the function pointer variables of function types defined in *_functions.h
 	typedef struct API_FUNCTIONS
 	{
-		//These function pointers will be resolved via API hashing 
-
 		/* NTDLL */
 		pNtQueryInformationProcess_t pNtQueryInformationProcess;
 		pNtCreateProcess_t			 pNtCreateProcess;

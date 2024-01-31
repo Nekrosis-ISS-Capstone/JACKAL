@@ -36,7 +36,7 @@ const API_ACCESS& APIResolver::GetAPIAccess() const
 // This function will resolve all of the functions in our API_FUNCTIONS struct
 void APIResolver::ResolveFunctions(API_MODULES hModuleHandle)
 {
-	Tools tools;
+	Logging tools;
 
 	// Get the number of function pointers in the struct
 	size_t numFunctions = sizeof(API_FUNCTIONS) / sizeof(PVOID);
@@ -64,7 +64,7 @@ void APIResolver::ResolveFunctions(API_MODULES hModuleHandle)
 
 void APIResolver::LoadModules()
 {
-    Tools tools;
+    Logging tools;
 
     this->api.mod.Kernel32 = LoadLibraryA("kernel32.dll");
     this->api.mod.Ntdll    = LoadLibraryA("ntdll.dll");
@@ -90,7 +90,7 @@ uintptr_t API::GetProcessAddress(void *pBase, LPCSTR szFunc)
 {
     unsigned char* pBaseAddr = reinterpret_cast<unsigned char*>(pBase);
 
-    Tools tools; // For error reporting functionality
+    Logging tools; // For error reporting functionality
 
     PIMAGE_DOS_HEADER       pDosHeader  = nullptr;
     PIMAGE_NT_HEADERS       pNtHeaders  = nullptr;
@@ -169,7 +169,7 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, size_t func, LPCSTR szFunc)
 
     unsigned char* pBaseAddr = reinterpret_cast<unsigned char*>(pBase);
 
-    Tools tools; // For error reporting functionality
+    Logging tools; // For error reporting functionality
 
     PIMAGE_DOS_HEADER       pDosHeader  = nullptr;
     PIMAGE_NT_HEADERS       pNtHeaders  = nullptr;

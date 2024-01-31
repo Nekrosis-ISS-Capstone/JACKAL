@@ -1,14 +1,14 @@
 #include "../headers/Tools.h"
 #include <functional>
 
-void Tools::ShowError(const char* error)
+void Logging::ShowError(const char* error)
 {
 //#ifdef _DEBUG
     MessageBoxA(NULL, error, "Error", MB_ICONERROR | MB_OK);
 //#endif // DEBUG
 }
 
-void Tools::ShowError(const char* error, int errnum)
+void Logging::ShowError(const char* error, int errnum)
 {
     //#ifdef _DEBUG
         // Format the error message with the error number
@@ -18,7 +18,7 @@ void Tools::ShowError(const char* error, int errnum)
     MessageBoxA(NULL, errorMessage.c_str(), "Error", MB_ICONERROR | MB_OK);
     //#endif // DEBUG
 }
-void Tools::DisplayMessage(const char *format, ...)
+void Logging::DisplayMessage(const char *format, ...)
 {
     const int bufferSize = 512;
     char buffer[bufferSize];
@@ -31,7 +31,7 @@ void Tools::DisplayMessage(const char *format, ...)
     MessageBoxA(NULL, buffer, "Debug", MB_ICONINFORMATION | MB_OK);
 }
 
-void Tools::EnableDebugConsole()
+void Logging::EnableDebugConsole()
 {
     if (AllocConsole())
     {

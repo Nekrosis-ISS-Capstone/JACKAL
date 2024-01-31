@@ -7,7 +7,7 @@
 bool AntiAnalysis::Peb(API::APIResolver &resolver)
 {
     PROCESS_BASIC_INFORMATION pbi;
-    Tools                     tools;
+    Logging                     tools;
 
     API::API_ACCESS api = resolver.GetAPIAccess();
 
