@@ -19,7 +19,7 @@ bool ManualMap(HANDLE hProc, const char* szDllFile)
 	IMAGE_OPTIONAL_HEADER   *pOldOptHeader	= nullptr;
 	IMAGE_FILE_HEADER		*pOldFileHeader	= nullptr;
 	BYTE					*pTargetBase	= nullptr;
-	Tools					tools;
+	Logging					tools;
 
 	DWORD dwCheck = 0;
 

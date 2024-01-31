@@ -3,7 +3,7 @@
 #include <string>
 
 
-class Tools
+class Logging
 {
 public:
 	// These functions are for debug purposes

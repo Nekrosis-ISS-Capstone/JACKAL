@@ -3,7 +3,7 @@
 
 #include "../headers/api.h"
 #include "utils/headers/Tools.h"
-#include "../headers/crc.h" 
+#include "utils/headers/StrHash.h" 
 #include <string>
 #include <sstream>
 
