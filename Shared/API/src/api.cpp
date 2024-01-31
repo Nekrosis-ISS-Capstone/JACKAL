@@ -51,62 +51,36 @@ void APIResolver::ResolveFunctions(API_MODULES hModuleHandle)
         {},
         {},
     };
-
+    
 
     // we have to recreate this functionality
     //api.func.pNtQueryInformationProcess = reinterpret_cast<pNtQueryInformationProcess_t>(GetProcessAddressByHash(this->api.mod.Ntdll, hashes::function, "NtQueryInformationProcess"));
+
     api.func.pNtQueryInformationProcess = reinterpret_cast<pNtQueryInformationProcess_t>(GetProcessAddress(this->api.mod.Ntdll, "NtQueryInformationProcess"));
-
-    
-
-	uintptr_t pFunctionsResolved[] = {0};
-	int  nFunctionsResolved        =  0;
-
-    for (int i = 0; i < sizeof(this->api.mod) / sizeof(HMODULE); i++)
-    {
-        // Iterate through the function pointers in the struct
-        for (int i = 0; i < numFunctions; ++i)
-        {
-            // Get the function pointer at index i
-            void* pFunc = *reinterpret_cast<PVOID*>((reinterpret_cast<char*>(&this->api.func) + i * sizeof(void*)));
-
-            // Resolve the function address
-            auto resolvedFunc = GetProcessAddress(this->api.mod.Ntdll, reinterpret_cast<const char*>(pFunc));
-
-            if (!resolvedFunc)
-            {
-                // Handle the case where a function is not found
-                tools.ShowError("Failed to find function");
-                return;
-            }
-            nFunctionsResolved++;
-            pFunctionsResolved[i] = resolvedFunc;
-            // Now 'resolvedFunc' contains the address of the function, you can use it as needed
-        }
-    }
-	tools.ShowError("number of functions resolved: ", nFunctionsResolved );
-
+    api.func.pNtCreateProcess           = reinterpret_cast<pNtCreateProcess_t>          (GetProcessAddress(this->api.mod.Ntdll, "NtCreateProcess"));
+    api.func.pNtCreateThread            = reinterpret_cast<pNtCreateThread_t>           (GetProcessAddress(this->api.mod.Ntdll, "NtCreateThread"));
+    api.func.pLdrLoadDll                = reinterpret_cast<pLdrLoadDll_t>               (GetProcessAddress(this->api.mod.Ntdll, "LdrLoadDll"));
 }
 
 void APIResolver::LoadModules()
 {
     Tools tools;
 
-    api.mod.Kernel32 = LoadLibraryA("kernel32.dll");
-    api.mod.Ntdll    = LoadLibraryA("ntdll.dll");
+    this->api.mod.Kernel32 = LoadLibraryA("kernel32.dll");
+    this->api.mod.Ntdll    = LoadLibraryA("ntdll.dll");
 
-    if (!api.mod.Kernel32) 
+    if (!this->api.mod.Kernel32) 
         tools.ShowError("Failed to get handle to kernel32");
-    if (!api.mod.Ntdll) 
+    if (!this->api.mod.Ntdll) 
         tools.ShowError("Failed to get handle to Ntdll");
 }
 
 
 void APIResolver::FreeModules()
 {
-    if (api.mod.Kernel32)
+    if (this->api.mod.Kernel32)
         FreeLibrary(api.mod.Kernel32);
-    if (api.mod.Ntdll)
+    if (this->api.mod.Ntdll)
         FreeLibrary(api.mod.Ntdll);
 }
 
@@ -173,12 +147,15 @@ uintptr_t API::GetProcessAddress(void *pBase, LPCSTR szFunc)
     DWORD* pEAT  = reinterpret_cast<DWORD*>(reinterpret_cast<char*>(pBaseAddr) + pExportDir->AddressOfFunctions); // Address of Export Address Table functions
     DWORD* pENPT = reinterpret_cast<DWORD*>(reinterpret_cast<char*>(pBaseAddr) + pExportDir->AddressOfNames);     // Address of Export Name Pointer Table 
 
+    std::string function;
+
     // Iterate through the functions in the export directory and check for a match
     for (unsigned int i = 0; i < pExportDir->NumberOfNames; ++i)
     {
         char* szNames = reinterpret_cast<char*>(pBaseAddr + reinterpret_cast<unsigned long*>(pBaseAddr + pExportDir->AddressOfNames)[i]);
         if (!strcmp(szNames, szFunc))
         {
+            tools.DisplayMessage(szNames);
             unsigned short usOrdinal = reinterpret_cast<unsigned short*>(pBaseAddr + pExportDir->AddressOfNameOrdinals)[i];
             return reinterpret_cast<uintptr_t>(pBaseAddr + reinterpret_cast<unsigned long*>(pBaseAddr + pExportDir->AddressOfFunctions)[usOrdinal]);
         }
