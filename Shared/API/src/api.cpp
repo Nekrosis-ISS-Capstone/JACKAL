@@ -182,7 +182,7 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, size_t func, LPCSTR szFunc)
     DWORD exports_rva  = NULL;
 
     tools.ShowError("dynamic function hash: ", CRC32_STR_RUN("NtQueryInformationProcess"));
-    tools.ShowError("static function hash: ", hashes::function);
+    tools.DisplayMessage("static function hash: ", hashes::function);
 
     // Get DOS header
     pDosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(pBaseAddr);

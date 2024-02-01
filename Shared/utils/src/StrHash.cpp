@@ -35,3 +35,9 @@ constexpr DWORD HashStringDjb2A(const char* String) {
 
 	return Hash;
 }
+
+typedef struct {
+
+	CTIME_HASHA(MessageBoxA);
+
+}function_hashes;
