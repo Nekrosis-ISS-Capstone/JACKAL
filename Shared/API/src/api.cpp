@@ -12,7 +12,8 @@ using namespace API;
 
 namespace hashes
 {
-    constexpr static auto function = CRC32_STR_COMP("NtQueryInformationProcess");
+    constexpr static auto function = ("NtQueryInformationProcess");
+    constexpr auto hash = CTIME_HASHA(MessageBoxA);
 };
 
 // API_INIT CLASS

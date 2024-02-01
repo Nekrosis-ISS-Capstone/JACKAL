@@ -1,5 +1,8 @@
 #include "utils/headers/StrHash.h"
 
+constexpr auto g_KEY = RandomCompileTimeSeed() % 0xFF;
+
+
 constexpr int RandomCompileTimeSeed(void)
 {
 	return '0' * -40271 +
@@ -32,14 +35,3 @@ constexpr DWORD HashStringDjb2A(const char* String) {
 
 	return Hash;
 }
-
-// runtime hashing macros 
-#define RTIME_HASHA( API ) HashStringDjb2A((const char*) API)
-#define RTIME_HASHW( API ) HashStringDjb2W((const wchar_t*) API)
-
-
-
-// compile time hashing macros (used to create variables)
-#define CTIME_HASHA( API ) constexpr auto API##_Rotr32A = HashStringDjb2A((const char*) #API);
-#define CTIME_HASHW( API ) constexpr auto API##_Rotr32W = HashStringDjb2W((const wchar_t*) L#API);
-
