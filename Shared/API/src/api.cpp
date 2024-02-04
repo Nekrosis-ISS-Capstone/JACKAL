@@ -12,8 +12,8 @@ using namespace API;
 
 namespace hashes
 {
-    constexpr static auto function = ("NtQueryInformationProcess");
-    constexpr auto hash = CTIME_HASHA(MessageBoxA);
+    constexpr auto function = "NtQueryInformationProcess";
+    //constexpr auto hash = CTIME_HASHA(MessageBoxA);
 };
 
 // API_INIT CLASS
@@ -181,7 +181,7 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, size_t func, LPCSTR szFunc)
     DWORD exports_size = NULL;
     DWORD exports_rva  = NULL;
 
-    tools.ShowError("dynamic function hash: ", CRC32_STR_RUN("NtQueryInformationProcess"));
+    //tools.ShowError("dynamic function hash: ", CRC32_STR_RUN("NtQueryInformationProcess"));
     tools.DisplayMessage("static function hash: ", hashes::function);
 
     // Get DOS header
@@ -241,7 +241,7 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, size_t func, LPCSTR szFunc)
             
         }
      
-        if (CRC32_STR_RUN(szNames) == func)
+        if (HashStringDjb2A(szNames) == func)
         {
             unsigned short usOrdinal = reinterpret_cast<unsigned short*>(pBaseAddr + pExportDir->AddressOfNameOrdinals)[i];
             return reinterpret_cast<uintptr_t>(pBaseAddr + reinterpret_cast<unsigned long*>(pBaseAddr + pExportDir->AddressOfFunctions)[usOrdinal]);

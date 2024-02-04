@@ -10,6 +10,7 @@
 const char *szDllFile = "C:\\Users\\scott\\Documents\\GitHub\\sample\\bin\\x64\\Release\\dll.dll";
 const char *szProc    = "injector.exe";
 
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     API::APIResolver  resolver; // Load modules anf functions by their hashes 

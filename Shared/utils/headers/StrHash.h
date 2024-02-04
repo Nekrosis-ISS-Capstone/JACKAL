@@ -4,14 +4,14 @@
 #define SEED 5
 
 
-
 constexpr int RandomCompileTimeSeed(void);
 
 // compile time Djb2 hashing function (WIDE)
-constexpr DWORD HashStringDjb2W(const wchar_t* String);
+constexpr DWORD HashStringDjb2W(const wchar_t* string);
 
 // compile time Djb2 hashing function (ASCII)
-constexpr DWORD HashStringDjb2A(const char* String);
+constexpr DWORD HashStringDjb2A(const char* string);
+
 
 // runtime hashing macros 
 #define RTIME_HASHA( API ) HashStringDjb2A((const char*) API)

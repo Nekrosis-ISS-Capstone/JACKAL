@@ -1,6 +1,11 @@
 #include "utils/headers/StrHash.h"
 
-constexpr auto g_KEY = RandomCompileTimeSeed() % 0xFF;
+
+template <typename T, T Value>
+struct integral_constant {
+	static constexpr T value = Value;
+};
+
 
 
 constexpr int RandomCompileTimeSeed(void)
@@ -13,6 +18,8 @@ constexpr int RandomCompileTimeSeed(void)
 		__TIME__[1] * 3600 +
 		__TIME__[0] * 36000;
 };
+
+constexpr auto g_KEY = RandomCompileTimeSeed() % 0xFF;
 
 // compile time Djb2 hashing function (WIDE)
 constexpr DWORD HashStringDjb2W(const wchar_t* String) {
@@ -36,8 +43,11 @@ constexpr DWORD HashStringDjb2A(const char* String) {
 	return Hash;
 }
 
+
+constexpr const char* ntqueryinformationprocess_str = "NtQueryInformationProcess";
+constexpr auto ntqueryinformationprocess = integral_constant<DWORD, HashStringDjb2A(ntqueryinformationprocess_str)>::value;
+
 typedef struct {
 
-	CTIME_HASHA(MessageBoxA);
 
 }function_hashes;
