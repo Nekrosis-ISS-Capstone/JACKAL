@@ -5,6 +5,9 @@
 #include "utils/headers/Tools.h"
 #include <string>
 #include <sstream>
+#include <cstdint>
+#include <unordered_map>
+#include <functional>
 
 #define SEED 5
 
@@ -84,6 +87,16 @@ const API_ACCESS& APIResolver::GetAPIAccess() const
 void APIResolver::ResolveFunctions(API_MODULES hModuleHandle)
 {
 	//Logging tools;
+
+
+    //   // Map function names to function pointers
+    //std::unordered_map<std::string, std::function<void* ()>> functionMap = 
+    //{
+    //    {hashes::NtQueryInformationProcess, []() { return GetProcessAddressByHash(api.mod.Ntdll, hashes::NtQueryInformationProcess); }},
+    //    {hashes::NtCreateProcess, []() { return GetProcessAddressByHash(api.mod.Ntdll, hashes::NtCreateProcess); }},
+    //    {hashes::NtCreateThread, []() { return GetProcessAddressByHash(api.mod.Ntdll, hashes::NtCreateThread); }},
+    //    {hashes::LdrLoadDll, []() { return GetProcessAddressByHash(this->api.mod.Ntdll, hashes::LdrLoadDll); }},
+    //};
 
     api.func.pNtQueryInformationProcess = reinterpret_cast<pNtQueryInformationProcess_t>(GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtQueryInformationProcess));
     api.func.pNtCreateProcess           = reinterpret_cast<pNtCreateProcess_t>          (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateProcess));
@@ -261,7 +274,6 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
 
         if (HashStringDjb2A(szNames) == func)
         {
-            tools.DisplayMessage(szNames);
             unsigned short usOrdinal = reinterpret_cast<unsigned short*>(pBaseAddr + pExportDir->AddressOfNameOrdinals)[i];
             return reinterpret_cast<uintptr_t>(pBaseAddr + reinterpret_cast<unsigned long*>(pBaseAddr + pExportDir->AddressOfFunctions)[usOrdinal]);
         }
