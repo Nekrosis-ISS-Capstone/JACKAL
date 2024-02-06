@@ -63,10 +63,11 @@ namespace API
 		APIResolver();
 		~APIResolver();
 		
+		void IATCamo();
 		void FreeModules();
 		const API_ACCESS& GetAPIAccess() const;
 	private:
-
+		PVOID Helper(PVOID* ppAddress);
 		void LoadModules();
 		void ResolveFunctions(API_MODULES pModules);
 

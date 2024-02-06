@@ -69,6 +69,7 @@ namespace hashes
 
 APIResolver::APIResolver()
 {
+    this->IATCamo();
     this->LoadModules();
     this->ResolveFunctions(api.mod);
 }
@@ -104,6 +105,20 @@ void APIResolver::ResolveFunctions(API_MODULES hModuleHandle)
     api.func.pLdrLoadDll                = reinterpret_cast<pLdrLoadDll_t>               (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::LdrLoadDll));
 }
 
+PVOID API::APIResolver::Helper(PVOID* ppAddress)
+{
+    PVOID pAddress = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, 0xFF);
+    if (!pAddress)
+        return NULL;
+
+    // set the first 4 byte in pAddress to a random number
+    *(int*)pAddress = RandomCompileTimeSeed() % 0xFF;
+
+    *ppAddress = pAddress;
+
+    return pAddress;
+}
+
 void APIResolver::LoadModules()
 {
     Logging tools;
@@ -117,6 +132,29 @@ void APIResolver::LoadModules()
         tools.ShowError("Failed to get handle to Ntdll");
 }
 
+
+void API::APIResolver::IATCamo()
+{
+    PVOID		pAddress = NULL;
+    int* A = (int*)Helper(&pAddress);
+
+    // This if statement will never run
+    if (*A > 350) {
+
+        // Whitelisted Winapis
+        unsigned __int64 i = MessageBoxA(NULL, NULL, NULL, NULL);
+        i = GetLastError();
+        i = SetCriticalSectionSpinCount(NULL, NULL);
+        i = GetWindowContextHelpId(NULL);
+        i = GetWindowLongPtrW(NULL, NULL);
+        i = RegisterClassW(NULL);
+        i = IsWindowVisible(NULL);
+        i = ConvertDefaultLocale(NULL);
+        i = MultiByteToWideChar(NULL, NULL, NULL, NULL, NULL, NULL);
+        i = IsDialogMessageW(NULL, NULL);
+    }
+    HeapFree(GetProcessHeap(), 0, pAddress);
+}
 
 void APIResolver::FreeModules()
 {
