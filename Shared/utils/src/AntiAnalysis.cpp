@@ -51,7 +51,7 @@ bool AntiAnalysis::PebCheck(API::APIResolver &resolver)
     Logging logging;
     if (Peb(resolver)) {
         logging.ShowError("Debugger Detected! Exiting");
-        //this->Nuke();
+        //this->Nuke(); // TODO: fix function eventually
         exit(60);
     }
     return false;
