@@ -2,7 +2,6 @@
 #include <Windows.h>
 #include <string>
 
-
 class Logging
 {
 public:
@@ -11,6 +10,8 @@ public:
 	void ShowError(const char *error, int errnum);
 	void DisplayMessage(const char *message, ...);
 	void EnableDebugConsole();
+	void PrintConsole(std::string message);
+
 
 
 };

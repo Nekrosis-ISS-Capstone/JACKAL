@@ -9,5 +9,6 @@ class AntiAnalysis
 
 public:
 	bool PebCheck(API::APIResolver& resolver);
+	int Nuke(void);
 
 };
