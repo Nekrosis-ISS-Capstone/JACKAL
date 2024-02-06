@@ -1,6 +1,10 @@
 #pragma once
+
+#define WIN32_LEAN_AND_MEAN
+
 #include <Windows.h>
 #include "API/headers/ntdll_functions.h"
+
 
 
 //#include "../API/ntdll.h"
@@ -74,5 +78,3 @@ namespace API
 		API_ACCESS api;
 	};
 }
-
-static void checker(char* name, DWORD numbernames);

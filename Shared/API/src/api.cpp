@@ -55,9 +55,6 @@ constexpr DWORD API::HashStringDjb2A(const char* string) {
 }
 
 
-
-
-
 namespace hashes
 {
     constexpr DWORD NtQueryInformationProcess = integral_constant<DWORD, HashStringDjb2A("NtQueryInformationProcess")>::value;
