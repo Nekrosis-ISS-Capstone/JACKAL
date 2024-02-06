@@ -2,15 +2,16 @@
 #include <Windows.h>
 #include "API/headers/ntdll_functions.h"
 
+
 //#include "../API/ntdll.h"
 namespace API
 {
-	typedef struct
-	{
-		size_t	 FunctionHash;
-		HMODULE* Module;
-		LPVOID*  Function;
-	} API_T;
+	//typedef struct
+	//{
+	//	size_t	 FunctionHash;
+	//	HMODULE* Module;
+	//	LPVOID*  Function;
+	//} API_T;
 
 	typedef struct API_MODULES
 	{
@@ -41,9 +42,20 @@ namespace API
 
 	}API_ACCESS;
 
+	// ---- Hashing Functions ----
+	constexpr int RandomCompileTimeSeed(void);
+	// compile time Djb2 hashing function (WIDE)
+	constexpr DWORD HashStringDjb2W(const wchar_t* string);
+
+	// compile time Djb2 hashing function (ASCII)
+	constexpr DWORD HashStringDjb2A(const char* string);
+
+	// ---------------------------------
+
+
 	// Functions to get a function address by name and one to get by hash
 	uintptr_t GetProcessAddress		 (void* pBase, LPCSTR szFunc); 
-	uintptr_t GetProcessAddressByHash(void* pBase, size_t func, LPCSTR szFunc); 
+	uintptr_t GetProcessAddressByHash(void* pBase, DWORD func); 
 
 	class APIResolver
 	{

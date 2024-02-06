@@ -3,20 +3,66 @@
 
 #include "../headers/api.h"
 #include "utils/headers/Tools.h"
-#include "utils/headers/StrHash.h" 
 #include <string>
 #include <sstream>
 
+#define SEED 5
+
 using namespace API;
+
+template <typename T, T Value>
+struct integral_constant {
+    static constexpr T value = Value;
+};
+
+// Generate seed for string hashing
+constexpr int API::RandomCompileTimeSeed(void)
+{
+    return '0' * -40271 +
+        __TIME__[7] * 1 +
+        __TIME__[6] * 10 +
+        __TIME__[4] * 60 +
+        __TIME__[3] * 600 +
+        __TIME__[1] * 3600 +
+        __TIME__[0] * 36000;
+}; 
+
+constexpr auto g_KEY = API::RandomCompileTimeSeed() % 0xFF; // Create seed variable
+
+// compile time Djb2 hashing function (WIDE)
+constexpr DWORD HashStringDjb2W(const wchar_t* string) {
+    ULONG hash = (ULONG)g_KEY;
+    INT c = 0;
+    while ((c = *string++)) {
+        hash = ((hash << SEED) + hash) + c;
+    }
+
+    return hash;
+}
+
+// compile time Djb2 hashing function (ASCII)
+constexpr DWORD API::HashStringDjb2A(const char* string) {
+    ULONG hash = (ULONG)g_KEY;
+    INT c = 0;
+    while ((c = *string++)) {
+        hash = ((hash << SEED) + hash) + c;
+    }
+
+    return hash;
+}
+
+
+
 
 
 namespace hashes
 {
-    constexpr auto function = "NtQueryInformationProcess";
-    //constexpr auto hash = CTIME_HASHA(MessageBoxA);
+    constexpr DWORD NtQueryInformationProcess = integral_constant<DWORD, HashStringDjb2A("NtQueryInformationProcess")>::value;
+    constexpr DWORD NtCreateProcess           = integral_constant<DWORD, HashStringDjb2A("NtCreateProcess")>::value;
+    constexpr DWORD NtTerminateProcess        = integral_constant<DWORD, HashStringDjb2A("NtTerminateProcess")>::value;
+    constexpr DWORD NtCreateThread            = integral_constant<DWORD, HashStringDjb2A("NtCreateThread")>::value;
+    constexpr DWORD LdrLoadDll                = integral_constant<DWORD, HashStringDjb2A("LdrLoadDll")>::value;
 };
-
-// API_INIT CLASS
 
 APIResolver::APIResolver()
 {
@@ -37,30 +83,12 @@ const API_ACCESS& APIResolver::GetAPIAccess() const
 // This function will resolve all of the functions in our API_FUNCTIONS struct
 void APIResolver::ResolveFunctions(API_MODULES hModuleHandle)
 {
-	Logging tools;
+	//Logging tools;
 
-	// Get the number of function pointers in the struct
-	size_t numFunctions = sizeof(API_FUNCTIONS) / sizeof(PVOID);
-
-    tools.ShowError("Number of functions: ", (int)numFunctions);
-
-    
-
-    API_T ApiList[]
-    {
-        {},
-        {},
-        {},
-    };
-    
-
-    // we have to recreate this functionality
-    //api.func.pNtQueryInformationProcess = reinterpret_cast<pNtQueryInformationProcess_t>(GetProcessAddressByHash(this->api.mod.Ntdll, hashes::function, "NtQueryInformationProcess"));
-
-    api.func.pNtQueryInformationProcess = reinterpret_cast<pNtQueryInformationProcess_t>(GetProcessAddress(this->api.mod.Ntdll, "NtQueryInformationProcess"));
-    api.func.pNtCreateProcess           = reinterpret_cast<pNtCreateProcess_t>          (GetProcessAddress(this->api.mod.Ntdll, "NtCreateProcess"));
-    api.func.pNtCreateThread            = reinterpret_cast<pNtCreateThread_t>           (GetProcessAddress(this->api.mod.Ntdll, "NtCreateThread"));
-    api.func.pLdrLoadDll                = reinterpret_cast<pLdrLoadDll_t>               (GetProcessAddress(this->api.mod.Ntdll, "LdrLoadDll"));
+    api.func.pNtQueryInformationProcess = reinterpret_cast<pNtQueryInformationProcess_t>(GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtQueryInformationProcess));
+    api.func.pNtCreateProcess           = reinterpret_cast<pNtCreateProcess_t>          (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateProcess));
+    api.func.pNtCreateThread            = reinterpret_cast<pNtCreateThread_t>           (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateThread));
+    api.func.pLdrLoadDll                = reinterpret_cast<pLdrLoadDll_t>               (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::LdrLoadDll));
 }
 
 void APIResolver::LoadModules()
@@ -156,7 +184,6 @@ uintptr_t API::GetProcessAddress(void *pBase, LPCSTR szFunc)
         char* szNames = reinterpret_cast<char*>(pBaseAddr + reinterpret_cast<unsigned long*>(pBaseAddr + pExportDir->AddressOfNames)[i]);
         if (!strcmp(szNames, szFunc))
         {
-            tools.DisplayMessage(szNames);
             unsigned short usOrdinal = reinterpret_cast<unsigned short*>(pBaseAddr + pExportDir->AddressOfNameOrdinals)[i];
             return reinterpret_cast<uintptr_t>(pBaseAddr + reinterpret_cast<unsigned long*>(pBaseAddr + pExportDir->AddressOfFunctions)[usOrdinal]);
         }
@@ -165,9 +192,8 @@ uintptr_t API::GetProcessAddress(void *pBase, LPCSTR szFunc)
     return NULL;
 }
 
-uintptr_t API::GetProcessAddressByHash(void* pBase, size_t func, LPCSTR szFunc)
+uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
 {
-
     unsigned char* pBaseAddr = reinterpret_cast<unsigned char*>(pBase);
 
     Logging tools; // For error reporting functionality
@@ -180,9 +206,6 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, size_t func, LPCSTR szFunc)
 
     DWORD exports_size = NULL;
     DWORD exports_rva  = NULL;
-
-    //tools.ShowError("dynamic function hash: ", CRC32_STR_RUN("NtQueryInformationProcess"));
-    tools.DisplayMessage("static function hash: ", hashes::function);
 
     // Get DOS header
     pDosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(pBaseAddr);
@@ -236,13 +259,9 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, size_t func, LPCSTR szFunc)
     {
         char* szNames = reinterpret_cast<char*>(pBaseAddr + reinterpret_cast<unsigned long*>(pBaseAddr + pExportDir->AddressOfNames)[i]);
 
-        if (!strcmp(szNames, szFunc))
-        {
-            
-        }
-     
         if (HashStringDjb2A(szNames) == func)
         {
+            tools.DisplayMessage(szNames);
             unsigned short usOrdinal = reinterpret_cast<unsigned short*>(pBaseAddr + pExportDir->AddressOfNameOrdinals)[i];
             return reinterpret_cast<uintptr_t>(pBaseAddr + reinterpret_cast<unsigned long*>(pBaseAddr + pExportDir->AddressOfFunctions)[usOrdinal]);
         }

@@ -18,13 +18,11 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)API\headers\custom_ntdll.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)API\headers\ntdll.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)API\headers\ntdll_functions.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)utils\headers\StrHash.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)utils\headers\AntiAnalysis.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)API\headers\api.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)utils\headers\Tools.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)utils\src\StrHash.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)utils\src\AntiAnalysis.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)API\src\api.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)utils\src\Tools.cpp" />
