@@ -62,6 +62,7 @@ namespace hashes
     constexpr DWORD NtTerminateProcess        = integral_constant<DWORD, HashStringDjb2A("NtTerminateProcess")>::value;
     constexpr DWORD NtCreateThread            = integral_constant<DWORD, HashStringDjb2A("NtCreateThread")>::value;
     constexpr DWORD LdrLoadDll                = integral_constant<DWORD, HashStringDjb2A("LdrLoadDll")>::value;
+    constexpr DWORD LdrLoadDll                = integral_constant<DWORD, HashStringDjb2A("NtOpenProcess")>::value;
 };
 
 APIResolver::APIResolver()
@@ -100,6 +101,7 @@ void APIResolver::ResolveFunctions(API_MODULES hModuleHandle)
     api.func.pNtCreateProcess           = reinterpret_cast<pNtCreateProcess_t>          (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateProcess));
     api.func.pNtCreateThread            = reinterpret_cast<pNtCreateThread_t>           (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateThread));
     api.func.pLdrLoadDll                = reinterpret_cast<pLdrLoadDll_t>               (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::LdrLoadDll));
+    api.func.pNtOpenProcess = reinterpret_cast<pNtOpenProcess_t>            (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtOpenProcess));
 }
 
 PVOID API::APIResolver::Helper(PVOID* ppAddress)

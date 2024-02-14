@@ -13,7 +13,7 @@ const char *szProc    = "injector.exe";
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-    API::APIResolver  resolver; // Load modules anf functions by their hashes 
+    API::APIResolver  resolver; // Load modules and functions by their hashes 
     AntiAnalysis      debug;    // Debug and sandbox checking
     Logging           tools;    // Used for error reporting
     PROCESSENTRY32    PE32{0};  // Used for getting information about processes
