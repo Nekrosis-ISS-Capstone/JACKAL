@@ -35,6 +35,7 @@ namespace API
 		pNtTerminateProcess_t		 pNtTerminateProcess;
 		pNtCreateThread_t			 pNtCreateThread;
 		pLdrLoadDll_t				 pLdrLoadDll;
+		pNtOpenProcess_t			 pNtOpenProcess;
 
 	}API_FUNCTIONS;
 

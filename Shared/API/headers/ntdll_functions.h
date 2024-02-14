@@ -1,8 +1,7 @@
 #pragma once
 
 #include "API/headers/custom_ntdll.h" // This might get used in the future
-//#include <Windows.h>
-#include <winternl.h>
+#include "ntdll.h"
 
 typedef NTSTATUS(__stdcall* pNtQueryInformationProcess_t)(
 	_In_      HANDLE           ProcessHandle,
@@ -12,6 +11,13 @@ typedef NTSTATUS(__stdcall* pNtQueryInformationProcess_t)(
 	_Out_opt_ PULONG           ReturnLength
 	);
 
+
+typedef NTSTATUS(__stdcall *pNtOpenProcess_t)(
+	_Out_	 PHANDLE ProcessHandle,
+	_In_	 ACCESS_MASK DesiredAccess,
+	_In_	 POBJECT_ATTRIBUTES ObjectAttributes,
+	_In_opt_ PCLIENT_ID ClientId
+);
 
 typedef NTSTATUS(__stdcall* pNtCreateProcess_t)(
 	_Out_    PHANDLE			ProcessHandle,
