@@ -20,9 +20,11 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)API\headers\ntdll_functions.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)utils\headers\AntiAnalysis.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)API\headers\api.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)utils\headers\RunSysCommands.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)utils\headers\Tools.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)utils\src\RunSysCommands.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)utils\src\AntiAnalysis.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)API\src\api.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)utils\src\Tools.cpp" />
