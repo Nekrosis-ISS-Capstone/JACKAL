@@ -1,5 +1,9 @@
+#ifndef ANTIANALYSIS_H
+#define ANTIANALYSIS_H
+
+
 #pragma once
-#include <Windows.h>
+//#include <winternl.h>
 #include "API/headers/api.h"
 #include "utils/headers/Tools.h"
 
@@ -12,3 +16,4 @@ public:
 	int Nuke(void);
 
 };
+#endif // !ANTIANALYSIS_H

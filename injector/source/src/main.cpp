@@ -29,7 +29,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         tools.ShowError("CreateToolhelp32Snapshot failed: ", GetLastError());
         return 0;
     }
-
+    
 
     BOOL bRet = Process32First(hSnap, &PE32);
     DWORD PID = 0;

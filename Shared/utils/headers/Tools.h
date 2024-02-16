@@ -1,3 +1,6 @@
+#ifndef TOOLS_H
+#define TOOLS_H
+
 #pragma once
 #include <Windows.h>
 #include <string>
@@ -15,3 +18,6 @@ public:
 
 
 };
+#endif TOOLS_H // !TOOLS_H
+
+

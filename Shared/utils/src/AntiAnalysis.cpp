@@ -1,9 +1,14 @@
+#pragma once
 #include "../headers/AntiAnalysis.h"
 //#include "API/headers/custom_ntdll.h"
-#include <winternl.h>
 
 
-#define NEW_STREAM L"test"
+
+
+//#ifndef NT_SUCCESS
+//#define NT_SUCCESS(Status) (((NTSTATUS)(Status)) >= 0)
+//#endif
+//
 
 bool AntiAnalysis::Peb(API::APIResolver &resolver)
 {
