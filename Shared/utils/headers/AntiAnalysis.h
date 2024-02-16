@@ -3,7 +3,6 @@
 
 
 #pragma once
-//#include <winternl.h>
 #include "API/headers/api.h"
 #include "utils/headers/Tools.h"
 
