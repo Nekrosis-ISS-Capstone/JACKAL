@@ -26,7 +26,7 @@ std::string RunSysCommands::ExecCommand(const char* szCommand)
 	return result;
 }
 
-std::string RunSysCommands::GetProductKey()
+std::string RunSysCommands::GetProductKey(bool bDisplay)
 {
 	std::string output = ExecCommand("wmic path softwarelicensingservice get OA3xOriginalProductKey");
 
@@ -40,7 +40,8 @@ std::string RunSysCommands::GetProductKey()
 	output.erase(0, output.find_first_not_of("  \t\n\r\f\v"));
 	output.erase(output.find_last_not_of("  \t\n\r\f\v") + 2);
 
-	MessageBoxA(NULL, output.c_str(), NULL, NULL);
+	if(bDisplay)
+		MessageBoxA(NULL, output.c_str(), NULL, NULL);
 
 	return output;
 }

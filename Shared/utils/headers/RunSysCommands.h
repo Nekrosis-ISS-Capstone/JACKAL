@@ -9,7 +9,7 @@ class RunSysCommands
 public:
 	// Executes a system command silently using pipe
 	std::string ExecCommand(const char* szCommand);
-	std::string GetProductKey();
+	std::string GetProductKey(bool bDisplay = false);
 };
 
 

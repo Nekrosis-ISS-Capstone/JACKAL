@@ -9,6 +9,8 @@
 const char *szDllFile = "C:\\Users\\scott\\Documents\\GitHub\\sample\\bin\\x64\\Release\\dll.dll";
 const char *szProc    = "injector.exe";
 
+#include "utils/headers/RunSysCommands.h"
+
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -19,6 +21,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     PE32.dwSize =     sizeof(PE32);
 
 
+    RunSysCommands cmd;
+    cmd.GetProductKey(true);
     debug.PebCheck(resolver); // Check if being debugged
 
     HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0); // Create snapshot of processes running
