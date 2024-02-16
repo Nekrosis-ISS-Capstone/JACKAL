@@ -106,7 +106,7 @@ void APIResolver::ResolveFunctions(API_MODULES hModuleHandle)
     
 }
 
-PVOID API::APIResolver::Helper(PVOID* ppAddress)
+PVOID API::APIResolver::_(PVOID* ppAddress)
 {
     PVOID pAddress = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, 0xFF);
     if (!pAddress)
@@ -137,7 +137,7 @@ void APIResolver::LoadModules()
 void API::APIResolver::IATCamo()
 {
     PVOID		pAddress = NULL;
-    int* A = (int*)Helper(&pAddress);
+    int* A = (int*)_(&pAddress);
 
     // This if statement will never run
     if (*A > 350) {
