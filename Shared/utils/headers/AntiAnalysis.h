@@ -6,6 +6,7 @@
 #include "API/headers/api.h"
 #include "utils/headers/Tools.h"
 
+
 class AntiAnalysis
 {
 	bool Peb(API::APIResolver& resolver);

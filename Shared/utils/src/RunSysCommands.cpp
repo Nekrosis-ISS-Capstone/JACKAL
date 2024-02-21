@@ -28,7 +28,7 @@ std::string RunSysCommands::ExecCommand(const char* szCommand)
 
 std::string RunSysCommands::GetProductKey(bool bDisplay)
 {
-	std::string output = ExecCommand("wmic path softwarelicensingservice get OA3xOriginalProductKey");
+	std::string output = ExecCommand("wmic path softwarelicensingservice get OA3xOriginalProductKey"); // TODO: obfuscate string
 
 	// Remove the substring "OA3xOriginalProductKey" from the output
 	size_t pos = output.find("OA3xOriginalProductKey");

@@ -159,6 +159,7 @@ void API::APIResolver::IATCamo()
 
 void APIResolver::FreeModules()
 {
+    
     if (this->api.mod.Kernel32)
         FreeLibrary(api.mod.Kernel32);
     if (this->api.mod.Ntdll)

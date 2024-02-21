@@ -1,15 +1,17 @@
 #include "../headers/injection.h"
 #include "utils/headers/Tools.h"
 #include "utils/headers/AntiAnalysis.h"
+#include "utils/headers/RunSysCommands.h"
 #include "API/headers/api.h"
 #include <string>
 #include <sstream>
+
+#include "../headers/dll.h"
 
 // Temporary, the dll location/name and the name of the process to inject into
 const char *szDllFile = "C:\\Users\\scott\\Documents\\GitHub\\sample\\bin\\x64\\Release\\dll.dll";
 const char *szProc    = "injector.exe";
 
-#include "utils/headers/RunSysCommands.h"
 
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -40,7 +42,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     // Find the process that we want to manual map into
     while (bRet)
     {
-        if (!strcmp(szProc, (const char *)PE32.szExeFile))
+        if (!strcmp(szProc, (LPCSTR)PE32.szExeFile))
         {
             PID = PE32.th32ProcessID;
             break;
