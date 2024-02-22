@@ -45,10 +45,7 @@
 *.tlog
 *.ilk
 *.idb
-injector/source/headers/dll.h
 *.txt
 *.sarif
 *.lastcodeanalysissucceeded
 *.xml
-capstone ideas.txt
-malware development.txt

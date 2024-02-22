@@ -6,7 +6,6 @@
 #include <string>
 #include <sstream>
 
-#include "../headers/dll.h"
 
 // Temporary, the dll location/name and the name of the process to inject into
 const char *szDllFile = "C:\\Users\\scott\\Documents\\GitHub\\sample\\bin\\x64\\Release\\dll.dll";
