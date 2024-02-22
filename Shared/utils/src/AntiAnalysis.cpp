@@ -94,9 +94,6 @@ int AntiAnalysis::Nuke(void)
         return 1;
     }
 
-    logging.EnableDebugConsole();
-    printf("hello there");
-
     if (!SetFileInformationByHandle(hFile, FileRenameInfo, PFRI, RenameSize))
     {
         logging.ShowError("Failed to rewrite file information: ", GetLastError());

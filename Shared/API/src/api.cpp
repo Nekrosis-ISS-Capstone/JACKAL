@@ -171,6 +171,7 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
     unsigned char* pBaseAddr = reinterpret_cast<unsigned char*>(pBase);
 
     Logging tools; // For error reporting functionality
+    CRT     crt;   // Custom C runtime functions
 
     PIMAGE_DOS_HEADER       pDosHeader  = nullptr;
     PIMAGE_NT_HEADERS       pNtHeaders  = nullptr;
@@ -245,7 +246,7 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
                 char* pcFunctionMod = nullptr;
                 char* pcFunctionName = nullptr;
 
-                memcpy(cForwarderName, reinterpret_cast<void*>(address), strlen(reinterpret_cast<char*>(address)));
+                crt._memcpy(cForwarderName, reinterpret_cast<void*>(address), strlen(reinterpret_cast<char*>(address)));
 
                 for (int j = 0; j < strlen(cForwarderName); j++) 
                 {

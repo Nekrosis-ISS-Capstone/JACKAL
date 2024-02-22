@@ -1,6 +1,9 @@
 #include "../headers/injection.h"
 #include "utils/headers/Tools.h"
 
+extern void* __cdecl memset(void*, int, size_t); // use our custom memset function
+
+
 #define RELOC_FLAG32(RelInfo) ((RelInfo >> 0x0C) == IMAGE_REL_BASED_HIGHLOW)
 #define RELOC_FLAG64(RelInfo) ((RelInfo >> 0x0C) == IMAGE_REL_BASED_DIR64)
 
@@ -19,14 +22,15 @@ bool ManualMap(HANDLE hProc, const char* szDllFile)
 	IMAGE_OPTIONAL_HEADER   *pOldOptHeader	= nullptr;
 	IMAGE_FILE_HEADER		*pOldFileHeader	= nullptr;
 	BYTE					*pTargetBase	= nullptr;
-	Logging					tools;
+	Logging					logging;
+	CRT						crt; 
 
 	DWORD dwCheck = 0;
 
 	// Check if the file exists by attempting to get the file attributes
 	if (!GetFileAttributesA(szDllFile))
 	{
-		tools.ShowError("File mapping: Cannot get DLL");
+		logging.ShowError("File mapping: Cannot get DLL");
 		return 0;
 	}
 
@@ -34,7 +38,7 @@ bool ManualMap(HANDLE hProc, const char* szDllFile)
 
 	if (file.fail())
 	{ 
-		tools.ShowError("Failed to open ifstream", (int)file.rdstate());
+		logging.ShowError("Failed to open ifstream", (int)file.rdstate());
 		file.close();
 		return 0;
 	}
@@ -43,7 +47,7 @@ bool ManualMap(HANDLE hProc, const char* szDllFile)
 	
 	if (FileSize < 0x1000)
 	{
-		tools.ShowError("Filesize invalid");
+		logging.ShowError("Filesize invalid");
 		file.close();
 		return 0;
 	}
@@ -52,7 +56,7 @@ bool ManualMap(HANDLE hProc, const char* szDllFile)
 	
 	if (!pSrcData)
 	{
-		tools.ShowError("Internal Memory Allocation Failed");
+		logging.ShowError("Internal Memory Allocation Failed");
 		file.close();
 		return 0;
 	}
@@ -65,7 +69,7 @@ bool ManualMap(HANDLE hProc, const char* szDllFile)
 	// Check the magic number
 	if (reinterpret_cast<IMAGE_DOS_HEADER*>(pSrcData)->e_magic != 0x5A4D)
 	{
-		tools.ShowError("Invalid file type");
+		logging.ShowError("Invalid file type");
 		delete[] pSrcData;
 		return 0;
 	}
@@ -79,7 +83,7 @@ bool ManualMap(HANDLE hProc, const char* szDllFile)
 	// Checking if DLL is 64 bit or not
 	if (pOldFileHeader->Machine != IMAGE_FILE_MACHINE_AMD64)
 	{
-		tools.ShowError("Incorrect Platform");
+		logging.ShowError("Incorrect Platform");
 		delete[] pSrcData;
 		return 0;
 	}
@@ -115,7 +119,7 @@ bool ManualMap(HANDLE hProc, const char* szDllFile)
 
 		if (!pTargetBase)
 		{
-			tools.ShowError("External Memory Allocation Failed", GetLastError());
+			logging.ShowError("External Memory Allocation Failed", GetLastError());
 			delete[] pSrcData;
 			return 0;
 		}
@@ -134,7 +138,7 @@ bool ManualMap(HANDLE hProc, const char* szDllFile)
 			{
 				if (!WriteProcessMemory(hProc, pTargetBase + pSectionHeader->VirtualAddress, pSrcData + pSectionHeader->PointerToRawData, pSectionHeader->SizeOfRawData, nullptr))
 				{
-					tools.ShowError("Cannot Map Sections", GetLastError());
+					logging.ShowError("Cannot Map Sections", GetLastError());
 					delete[] pSrcData;
 					VirtualFreeEx(hProc, pTargetBase, 0, MEM_RELEASE);
 					return 0;
@@ -142,7 +146,7 @@ bool ManualMap(HANDLE hProc, const char* szDllFile)
 			}
 		}
 	}
-	memcpy(pSrcData, &data, sizeof(data));
+	crt._memcpy(pSrcData, &data, sizeof(data));
 	WriteProcessMemory(hProc, pTargetBase, pSrcData, 0x1000, nullptr);
 
 	delete[] pSrcData;
@@ -151,7 +155,7 @@ bool ManualMap(HANDLE hProc, const char* szDllFile)
 	
 	if (!pShellCode)
 	{
-		tools.ShowError("External Memory Allocation Failed: ", GetLastError());
+		logging.ShowError("External Memory Allocation Failed: ", GetLastError());
 		VirtualFreeEx(hProc, pTargetBase,0, MEM_RELEASE);
 		return 0;
 	}
@@ -162,7 +166,7 @@ bool ManualMap(HANDLE hProc, const char* szDllFile)
 
 	if (!hThread)
 	{
-		tools.ShowError("Failed To Create Remote Thread: ", GetLastError());
+		logging.ShowError("Failed To Create Remote Thread: ", GetLastError());
 		VirtualFreeEx(hProc, pTargetBase,0, MEM_RELEASE);
 		VirtualFreeEx(hProc, pShellCode, 0, MEM_RELEASE);
 
