@@ -166,85 +166,6 @@ void APIResolver::FreeModules()
         FreeLibrary(api.mod.Ntdll);
 }
 
-
-// Custom GetProcAddress implementation to avoid usage of winapi functions
-uintptr_t API::GetProcessAddress(void *pBase, LPCSTR szFunc)
-{
-    unsigned char* pBaseAddr = reinterpret_cast<unsigned char*>(pBase);
-
-    Logging tools; // For error reporting functionality
-
-    PIMAGE_DOS_HEADER       pDosHeader  = nullptr;
-    PIMAGE_NT_HEADERS       pNtHeaders  = nullptr;
-    PIMAGE_FILE_HEADER      pFileHeader = nullptr;
-    PIMAGE_OPTIONAL_HEADER  pOptHeader  = nullptr;
-    PIMAGE_EXPORT_DIRECTORY pExportDir  = nullptr;
-
-    DWORD exports_size = NULL;
-    DWORD exports_rva  = NULL;
-
-    // Get DOS header
-    pDosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(pBaseAddr);
-
-    // Check magic number 
-    if (pDosHeader->e_magic != IMAGE_DOS_SIGNATURE)
-    {
-        tools.ShowError("Program Invalid: Incorrect DOS signature");
-        return NULL;
-    }
-
-    pNtHeaders = reinterpret_cast<PIMAGE_NT_HEADERS>(reinterpret_cast<char*>(pBaseAddr) + pDosHeader->e_lfanew); // Get pointer to the NT headers
-
-    // Get File and Optional headers
-    pFileHeader = &pNtHeaders->FileHeader;
-    pOptHeader  = &pNtHeaders->OptionalHeader;
-
-
-    // Verify that there is enough space for the NT headers
-    if (pDosHeader->e_lfanew + sizeof(IMAGE_NT_HEADERS) > pOptHeader->SizeOfImage)
-    {
-        tools.ShowError("Program Invalid: Insufficient space for NT headers");
-        return NULL;
-    }
-    
-    // Verify that the optional header contains enough data directories
-    if (pOptHeader->NumberOfRvaAndSizes < IMAGE_DIRECTORY_ENTRY_EXPORT + 1)
-    {
-        tools.ShowError("Program Invalid: Insufficient data directories");
-        return NULL;
-    }
-
-    // Get the size and virtual address of the export directory
-    exports_size = pOptHeader->DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].Size;
-    exports_rva  = pOptHeader->DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
-
-    // Verify that the export directory is within the image boundaries
-    if (exports_rva + exports_size > pOptHeader->SizeOfImage)
-    {
-        tools.ShowError("Program Invalid: Export directory out of bounds");
-        return NULL;
-    }
-
-    pExportDir   = reinterpret_cast<PIMAGE_EXPORT_DIRECTORY>(reinterpret_cast<char*>(pBaseAddr) + exports_rva);   // Get the RVA
-    DWORD* pEAT  = reinterpret_cast<DWORD*>(reinterpret_cast<char*>(pBaseAddr) + pExportDir->AddressOfFunctions); // Address of Export Address Table functions
-    DWORD* pENPT = reinterpret_cast<DWORD*>(reinterpret_cast<char*>(pBaseAddr) + pExportDir->AddressOfNames);     // Address of Export Name Pointer Table 
-
-    std::string function;
-
-    // Iterate through the functions in the export directory and check for a match
-    for (unsigned int i = 0; i < pExportDir->NumberOfNames; ++i)
-    {
-        char* szNames = reinterpret_cast<char*>(pBaseAddr + reinterpret_cast<unsigned long*>(pBaseAddr + pExportDir->AddressOfNames)[i]);
-        if (!strcmp(szNames, szFunc))
-        {
-            unsigned short usOrdinal = reinterpret_cast<unsigned short*>(pBaseAddr + pExportDir->AddressOfNameOrdinals)[i];
-            return reinterpret_cast<uintptr_t>(pBaseAddr + reinterpret_cast<unsigned long*>(pBaseAddr + pExportDir->AddressOfFunctions)[usOrdinal]);
-        }
-    }
-
-    return NULL;
-}
-
 uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
 {
     unsigned char* pBaseAddr = reinterpret_cast<unsigned char*>(pBase);
@@ -260,7 +181,6 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
     DWORD exports_size = NULL;
     DWORD exports_rva  = NULL;
 
-    // Get DOS header
     pDosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(pBaseAddr);
 
     // Check magic number 
@@ -306,7 +226,7 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
     DWORD* pEAT  = reinterpret_cast<DWORD*>(reinterpret_cast<char*>(pBaseAddr) + pExportDir->AddressOfFunctions); // Address of Export Address Table functions
     DWORD* pENPT = reinterpret_cast<DWORD*>(reinterpret_cast<char*>(pBaseAddr) + pExportDir->AddressOfNames);     // Address of Export Name Pointer Table 
 
-   
+
     // Iterate through the functions in the export directory and check for a match
     for (unsigned int i = 0; i < pExportDir->NumberOfNames; ++i)
     {
@@ -315,7 +235,34 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
         if (HashStringDjb2A(szNames) == func)
         {
             unsigned short usOrdinal = reinterpret_cast<unsigned short*>(pBaseAddr + pExportDir->AddressOfNameOrdinals)[i];
-            return reinterpret_cast<uintptr_t>(pBaseAddr + reinterpret_cast<unsigned long*>(pBaseAddr + pExportDir->AddressOfFunctions)[usOrdinal]);
+            uintptr_t address = reinterpret_cast<uintptr_t>(pBaseAddr + reinterpret_cast<unsigned long*>(pBaseAddr + pExportDir->AddressOfFunctions)[usOrdinal]);
+
+            // Check if the function is forwarded
+            if (address >= reinterpret_cast<uintptr_t>(pExportDir) && address < reinterpret_cast<uintptr_t>(pExportDir) + exports_size)
+            {
+                char cForwarderName[MAX_PATH] = { 0 };
+                DWORD dwDotOffset = 0x00;
+                char* pcFunctionMod = nullptr;
+                char* pcFunctionName = nullptr;
+
+                memcpy(cForwarderName, reinterpret_cast<void*>(address), strlen(reinterpret_cast<char*>(address)));
+
+                for (int j = 0; j < strlen(cForwarderName); j++) 
+                {
+                    if (cForwarderName[j] == '.') 
+                    {
+                        dwDotOffset = j;
+                        cForwarderName[j] = NULL;
+                        break;
+                    }
+                }
+
+                pcFunctionMod = cForwarderName;
+                pcFunctionName = cForwarderName + dwDotOffset + 1;
+
+                return GetProcessAddressByHash(LoadLibraryA(pcFunctionMod), HashStringDjb2A(pcFunctionName)); // TODO: use pLdrLoadDll
+            }
+            return address;
         }
     }
 
