@@ -1,5 +1,7 @@
 #pragma once
 #include "../headers/AntiAnalysis.h"
+#include "utils/headers/Tools.h"
+
 
 bool AntiAnalysis::Peb(API::APIResolver &resolver)
 {
