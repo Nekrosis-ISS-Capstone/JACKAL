@@ -5,25 +5,6 @@
 #include <Windows.h>
 #include <string>
 
-
-//extern void* __cdecl memset(void*, int, size_t);
-
-// Force compiler to use our memset function
-#pragma intrinsic(memset)
-#pragma function(memset)
-
-void* __cdecl memset(void* Destination, int Value, size_t Size) {
-	// logic similar to memset's one
-	unsigned char* p = (unsigned char*)Destination;
-	while (Size > 0) {
-		*p = (unsigned char)Value;
-		p++;
-		Size--;
-	}
-	return Destination;
-}
-
-
 #define PRINTA( STR, ... )                                                                  \
     if (1) {                                                                                \
         LPSTR buf = (LPSTR)HeapAlloc( GetProcessHeap(), HEAP_ZERO_MEMORY, 1024 );           \
