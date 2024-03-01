@@ -1,13 +1,14 @@
+#ifndef API_H
+#define API_H
+
 #pragma once
 
 #define WIN32_LEAN_AND_MEAN
 
 #include <Windows.h>
-#include "API/headers/ntdll_functions.h"
+#include <API/headers/api_functions.h>
 
 
-
-//#include "../API/ntdll.h"
 namespace API
 {
 	//typedef struct
@@ -49,25 +50,21 @@ namespace API
 
 	// ---- Hashing Functions ----
 	constexpr int RandomCompileTimeSeed(void);
-	// compile time Djb2 hashing function (WIDE)
-	constexpr DWORD HashStringDjb2W(const wchar_t* string);
 
 	// compile time Djb2 hashing function (ASCII)
 	constexpr DWORD HashStringDjb2A(const char* string);
 
 	// ---------------------------------
 
-
-	// Functions to get a function address by name and one to get by hash
-	uintptr_t GetProcessAddress		 (void* pBase, LPCSTR szFunc); 
-	uintptr_t GetProcessAddressByHash(void* pBase, DWORD func); 
+	// Get process address by hash
+	uintptr_t GetProcessAddressByHash(void* pBase, DWORD func);
 
 	class APIResolver
 	{
 	public:
 		APIResolver();
 		~APIResolver();
-		
+
 		void IATCamo();
 		void FreeModules();
 		const API_ACCESS& GetAPIAccess() const;
@@ -79,3 +76,5 @@ namespace API
 		API_ACCESS api;
 	};
 }
+
+#endif // !API_H

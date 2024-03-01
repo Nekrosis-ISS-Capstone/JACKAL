@@ -1,8 +1,32 @@
 // This file contains the function pointers to the ntapi/win32 api functions that are to be dynamically resolved at runtime
 
+// singleton 
 
-#include "../headers/api.h"
-#include "utils/headers/Tools.h"
+//
+//class APIResolver {
+//private:
+//    // Private constructor to prevent instantiation
+//    APIResolver() {}
+//
+//public:
+//    // Static method to get the single instance of APIResolver
+//    static APIResolver& getInstance() {
+//        static APIResolver instance;
+//        return instance;
+//    }
+//
+//    // Other member functions...
+//};
+//
+//// Usage:
+//auto& resolver = APIResolver::getInstance();
+//
+
+
+
+
+#include "../shared/API/headers/api.h"
+#include <utils/headers/tools.h>
 #include <string>
 #include <sstream>
 #include <cstdint>
@@ -18,6 +42,9 @@ struct integral_constant {
     static constexpr T value = Value;
 };
 
+
+extern void* __cdecl memset(void*, int, size_t);
+
 // Generate seed for string hashing
 constexpr int API::RandomCompileTimeSeed(void)
 {
@@ -28,20 +55,9 @@ constexpr int API::RandomCompileTimeSeed(void)
         __TIME__[3] * 600 +
         __TIME__[1] * 3600 +
         __TIME__[0] * 36000;
-}; 
+};
 
 constexpr auto g_KEY = API::RandomCompileTimeSeed() % 0xFF; // Create seed variable
-
-// compile time Djb2 hashing function (WIDE)
-constexpr DWORD HashStringDjb2W(const wchar_t* string) {
-    ULONG hash = (ULONG)g_KEY;
-    INT c = 0;
-    while ((c = *string++)) {
-        hash = ((hash << SEED) + hash) + c;
-    }
-
-    return hash;
-}
 
 // compile time Djb2 hashing function (ASCII)
 constexpr DWORD API::HashStringDjb2A(const char* string) {
@@ -77,7 +93,7 @@ APIResolver::~APIResolver()
 }
 
 
-const API_ACCESS& APIResolver::GetAPIAccess() const 
+const API_ACCESS& APIResolver::GetAPIAccess() const
 {
     return api;
 }
@@ -85,7 +101,7 @@ const API_ACCESS& APIResolver::GetAPIAccess() const
 // This function will resolve all of the functions in our API_FUNCTIONS struct
 void APIResolver::ResolveFunctions(API_MODULES hModuleHandle)
 {
-	//Logging tools;
+    //Logging tools;
 
 
     //   // Map function names to function pointers
@@ -98,12 +114,12 @@ void APIResolver::ResolveFunctions(API_MODULES hModuleHandle)
     //};
 
     api.func.pNtQueryInformationProcess = reinterpret_cast<pNtQueryInformationProcess_t>(GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtQueryInformationProcess));
-    api.func.pNtCreateProcess           = reinterpret_cast<pNtCreateProcess_t>          (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateProcess));
-    api.func.pNtCreateThread            = reinterpret_cast<pNtCreateThread_t>           (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateThread));
-    api.func.pLdrLoadDll                = reinterpret_cast<pLdrLoadDll_t>               (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::LdrLoadDll));
-    api.func.pNtOpenProcess             = reinterpret_cast<pNtOpenProcess_t>            (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtOpenProcess));
+    api.func.pNtCreateProcess = reinterpret_cast<pNtCreateProcess_t>          (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateProcess));
+    api.func.pNtCreateThread = reinterpret_cast<pNtCreateThread_t>           (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateThread));
+    api.func.pLdrLoadDll = reinterpret_cast<pLdrLoadDll_t>               (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::LdrLoadDll));
+    api.func.pNtOpenProcess = reinterpret_cast<pNtOpenProcess_t>            (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtOpenProcess));
 
-    
+
 }
 
 PVOID API::APIResolver::_(PVOID* ppAddress)
@@ -122,15 +138,17 @@ PVOID API::APIResolver::_(PVOID* ppAddress)
 
 void APIResolver::LoadModules()
 {
-    Logging tools;
+    //Logging tools;
 
     this->api.mod.Kernel32 = LoadLibraryA("kernel32.dll");
     this->api.mod.Ntdll    = LoadLibraryA("ntdll.dll");
 
-    if (!this->api.mod.Kernel32) 
-        tools.ShowError("Failed to get handle to kernel32");
-    if (!this->api.mod.Ntdll) 
-        tools.ShowError("Failed to get handle to Ntdll");
+    if (!this->api.mod.Kernel32)
+        //tools.ShowError("Failed to get handle to kernel32");
+        return;
+    if (!this->api.mod.Ntdll)
+        return;
+        //tools.ShowError("Failed to get handle to Ntdll");
 }
 
 
@@ -159,7 +177,7 @@ void API::APIResolver::IATCamo()
 
 void APIResolver::FreeModules()
 {
-    
+
     if (this->api.mod.Kernel32)
         FreeLibrary(api.mod.Kernel32);
     if (this->api.mod.Ntdll)
@@ -170,8 +188,8 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
 {
     unsigned char* pBaseAddr = reinterpret_cast<unsigned char*>(pBase);
 
-    Logging tools; // For error reporting functionality
-    CRT     crt;   // Custom C runtime functions
+    //Logging tools; // For error reporting functionality
+   // CRT     crt;   // Custom C runtime functions
 
     PIMAGE_DOS_HEADER       pDosHeader  = nullptr;
     PIMAGE_NT_HEADERS       pNtHeaders  = nullptr;
@@ -187,7 +205,7 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
     // Check magic number 
     if (pDosHeader->e_magic != IMAGE_DOS_SIGNATURE)
     {
-        tools.ShowError("Program Invalid: Incorrect DOS signature");
+        //tools.ShowError("Program Invalid: Incorrect DOS signature");
         return NULL;
     }
 
@@ -201,14 +219,14 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
     // Verify that there is enough space for the NT headers
     if (pDosHeader->e_lfanew + sizeof(IMAGE_NT_HEADERS) > pOptHeader->SizeOfImage)
     {
-        tools.ShowError("Program Invalid: Insufficient space for NT headers");
+        //tools.ShowError("Program Invalid: Insufficient space for NT headers");
         return NULL;
     }
 
     // Verify that the optional header contains enough data directories
     if (pOptHeader->NumberOfRvaAndSizes < IMAGE_DIRECTORY_ENTRY_EXPORT + 1)
     {
-        tools.ShowError("Program Invalid: Insufficient data directories");
+       // tools.ShowError("Program Invalid: Insufficient data directories");
         return NULL;
     }
 
@@ -219,7 +237,7 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
     // Verify that the export directory is within the image boundaries
     if (exports_rva + exports_size > pOptHeader->SizeOfImage)
     {
-        tools.ShowError("Program Invalid: Export directory out of bounds");
+        //tools.ShowError("Program Invalid: Export directory out of bounds");
         return NULL;
     }
 
@@ -242,15 +260,15 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
             if (address >= reinterpret_cast<uintptr_t>(pExportDir) && address < reinterpret_cast<uintptr_t>(pExportDir) + exports_size)
             {
                 char cForwarderName[MAX_PATH] = { 0 };
-                DWORD dwDotOffset = 0x00;
-                char* pcFunctionMod = nullptr;
+                DWORD dwDotOffset    = 0x00;
+                char* pcFunctionMod  = nullptr;
                 char* pcFunctionName = nullptr;
+                
+                memcpy(cForwarderName, reinterpret_cast<void*>(address), strlen(reinterpret_cast<char*>(address)));
 
-                crt._memcpy(cForwarderName, reinterpret_cast<void*>(address), strlen(reinterpret_cast<char*>(address)));
-
-                for (int j = 0; j < strlen(cForwarderName); j++) 
+                for (int j = 0; j < strlen(cForwarderName); j++)
                 {
-                    if (cForwarderName[j] == '.') 
+                    if (cForwarderName[j] == '.')
                     {
                         dwDotOffset = j;
                         cForwarderName[j] = NULL;

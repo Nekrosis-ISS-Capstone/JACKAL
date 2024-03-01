@@ -3,8 +3,8 @@
   <PropertyGroup Label="Globals">
     <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <HasSharedItems>true</HasSharedItems>
-    <ItemsProjectGuid>{e974d14e-9f63-443e-a914-9504fca66607}</ItemsProjectGuid>
-    <ItemsProjectName>Shared</ItemsProjectName>
+    <ItemsProjectGuid>{7137f2ff-f309-4d3f-891b-8674118268ed}</ItemsProjectGuid>
+    <ItemsProjectName>shared</ItemsProjectName>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
@@ -15,18 +15,12 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)API\headers\custom_ntdll.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)API\headers\ntdll.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)API\headers\ntdll_functions.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)utils\headers\AntiAnalysis.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)API\headers\api.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)utils\headers\RunSysCommands.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)utils\headers\Tools.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)API\headers\api_functions.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)API\src\api.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)utils\headers\tools.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)utils\src\RunSysCommands.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)utils\src\AntiAnalysis.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)API\src\api.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)utils\src\Tools.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)utils\src\tools.cpp" />
   </ItemGroup>
 </Project>
