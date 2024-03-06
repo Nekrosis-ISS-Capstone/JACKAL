@@ -1,0 +1,10 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "c:\\users\\scott\\documents\\github\\sample\\injector\\src\\mymodule.ixx",
+        "ProvidedModule": "MyModule",
+        "Includes": [],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}
