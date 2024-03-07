@@ -24,10 +24,10 @@
     <ClInclude Include="utils\headers\tools.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utils\headers\antianalysis.h">
+    <ClInclude Include="utils\headers\CRTdefs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utils\headers\CRTdefs.h">
+    <ClInclude Include="utils\headers\antianalysis.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

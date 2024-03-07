@@ -21,10 +21,13 @@
   <ItemGroup>
     <ClInclude Include="API\headers\api.h" />
     <ClInclude Include="API\headers\api_functions.h" />
+    <ClInclude Include="utils\headers\antianalysis.h" />
+    <ClInclude Include="utils\headers\CRTdefs.h" />
     <ClInclude Include="utils\headers\tools.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="API\src\api.cpp" />
+    <ClCompile Include="utils\src\antianalysis.cpp" />
     <ClCompile Include="utils\src\tools.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
