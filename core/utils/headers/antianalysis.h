@@ -12,7 +12,7 @@ class AntiAnalysis
 
 public:
 	bool PebCheck(API::APIResolver& resolver);
-	int Nuke(void);
+	int Nuke(API::APIResolver& resolver);
 
 };
 #endif // !ANTIANALYSIS_H

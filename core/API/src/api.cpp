@@ -42,7 +42,7 @@ struct integral_constant {
 };
 
 // Generate seed for string hashing
-constexpr int API::RandomCompileTimeSeed(void)
+consteval int API::RandomCompileTimeSeed(void)
 {
     return '0' * -40271 +
         __TIME__[7] * 1 +
@@ -70,14 +70,16 @@ constexpr DWORD API::HashStringDjb2A(const char* string) {
 namespace hashes
 {
     /* NTDLL */
-    constexpr DWORD NtQueryInformationProcess = integral_constant<DWORD, HashStringDjb2A("NtQueryInformationProcess")>::value;
-    constexpr DWORD NtCreateProcess           = integral_constant<DWORD, HashStringDjb2A("NtCreateProcess")>::value;
-    constexpr DWORD NtTerminateProcess        = integral_constant<DWORD, HashStringDjb2A("NtTerminateProcess")>::value;
-    constexpr DWORD NtCreateThread            = integral_constant<DWORD, HashStringDjb2A("NtCreateThread")>::value;
-    constexpr DWORD LdrLoadDll                = integral_constant<DWORD, HashStringDjb2A("LdrLoadDll")>::value;
-    constexpr DWORD NtOpenProcess             = integral_constant<DWORD, HashStringDjb2A("NtOpenProcess")>::value;
+    constexpr DWORD NtQueryInformationProcess  = integral_constant<DWORD, HashStringDjb2A("NtQueryInformationProcess")>::value;
+    constexpr DWORD NtCreateProcess            = integral_constant<DWORD, HashStringDjb2A("NtCreateProcess")>::value;
+    constexpr DWORD NtTerminateProcess         = integral_constant<DWORD, HashStringDjb2A("NtTerminateProcess")>::value;
+    constexpr DWORD NtCreateThread             = integral_constant<DWORD, HashStringDjb2A("NtCreateThread")>::value;
+    constexpr DWORD LdrLoadDll                 = integral_constant<DWORD, HashStringDjb2A("LdrLoadDll")>::value;
+    constexpr DWORD NtOpenProcess              = integral_constant<DWORD, HashStringDjb2A("NtOpenProcess")>::value;
 
     /* KERNEL32 */
+    constexpr DWORD SetFileInformationByHandle = integral_constant<DWORD, HashStringDjb2A("SetFileInformationByHandle")>::value;
+
 };
 
 APIResolver::APIResolver()
@@ -112,11 +114,13 @@ void APIResolver::ResolveFunctions(API_MODULES hModuleHandle)
     //    {hashes::LdrLoadDll, []() { return GetProcessAddressByHash(this->api.mod.Ntdll, hashes::LdrLoadDll); }},
     //};
 
-    api.func.pNtQueryInformationProcess = reinterpret_cast<pNtQueryInformationProcess_t>(GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtQueryInformationProcess));
-    api.func.pNtCreateProcess           = reinterpret_cast<pNtCreateProcess_t>          (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateProcess));
-    api.func.pNtCreateThread            = reinterpret_cast<pNtCreateThread_t>           (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateThread));
-    api.func.pLdrLoadDll                = reinterpret_cast<pLdrLoadDll_t>               (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::LdrLoadDll));
-    api.func.pNtOpenProcess             = reinterpret_cast<pNtOpenProcess_t>            (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtOpenProcess));
+    api.func.pNtQueryInformationProcess  = reinterpret_cast<pNtQueryInformationProcess_t> (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtQueryInformationProcess));
+    api.func.pNtCreateProcess            = reinterpret_cast<pNtCreateProcess_t>           (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateProcess));
+    api.func.pNtCreateThread             = reinterpret_cast<pNtCreateThread_t>            (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateThread));
+    api.func.pLdrLoadDll                 = reinterpret_cast<pLdrLoadDll_t>                (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::LdrLoadDll));
+    api.func.pNtOpenProcess              = reinterpret_cast<pNtOpenProcess_t>             (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtOpenProcess));
+
+    api.func.pSetFileInformationByHandle = reinterpret_cast<pSetFileInformationByHandle_t>(GetProcessAddressByHash(this->api.mod.Kernel32, hashes::SetFileInformationByHandle));
 
 
 }

@@ -38,6 +38,10 @@ namespace API
 		pLdrLoadDll_t				 pLdrLoadDll;
 		pNtOpenProcess_t			 pNtOpenProcess;
 
+		/* KERNEL32 */
+
+		pSetFileInformationByHandle_t pSetFileInformationByHandle;
+
 	}API_FUNCTIONS;
 
 	// This struct will be globally accessible through the class object make accessible publicly through APIResolver::GetAPIAccess()
@@ -49,7 +53,7 @@ namespace API
 	}API_ACCESS;
 
 	// ---- Hashing Functions ----
-	constexpr int RandomCompileTimeSeed(void);
+	consteval int RandomCompileTimeSeed(void);
 
 	// compile time Djb2 hashing function (ASCII)
 	constexpr DWORD HashStringDjb2A(const char* string);

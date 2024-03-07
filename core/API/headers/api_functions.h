@@ -7,6 +7,7 @@
 #include <Windows.h>
 #include "winternl.h"
 
+// NTDLL
 
 typedef NTSTATUS(__stdcall* pNtQueryInformationProcess_t)(
 	_In_      HANDLE           ProcessHandle,
@@ -55,5 +56,20 @@ typedef NTSTATUS(__stdcall* pLdrLoadDll_t)(
 	_Out_	  PHANDLE		  moduleHandle);
 
 
+
+// END NTDLL
+
+
+// KERNEL32
+
+typedef NTSTATUS (__stdcall* pSetFileInformationByHandle_t)(
+	_In_ HANDLE                    hFile,
+	_In_ FILE_INFO_BY_HANDLE_CLASS FileInformationClass,
+	_In_ LPVOID                    lpFileInformation,
+	_In_ DWORD                     dwBufferSize
+);
+
+
+// END KERNEL32
 
 #endif NTDLL_FUNCTIONS_H
