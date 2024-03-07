@@ -196,7 +196,7 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
     PIMAGE_EXPORT_DIRECTORY pExportDir  = nullptr;
 
     DWORD exports_size = NULL;
-    DWORD exports_rva = NULL;
+    DWORD exports_rva  = NULL;
 
     pDosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(pBaseAddr);
 

@@ -14,5 +14,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	debug.PebCheck(resolver);
 
-	
+	MessageBoxA(NULL, "working", "working", NULL);
+
+	return 0;
 } 

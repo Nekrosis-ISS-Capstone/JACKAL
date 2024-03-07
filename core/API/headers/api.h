@@ -56,6 +56,7 @@ namespace API
 
 	// ---------------------------------
 
+
 	// Get process address by hash
 	uintptr_t GetProcessAddressByHash(void* pBase, DWORD func);
 
