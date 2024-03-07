@@ -52,3 +52,5 @@
 *.json
 *.command
 *.dt
+
+/bin/
