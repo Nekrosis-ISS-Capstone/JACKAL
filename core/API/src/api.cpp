@@ -150,14 +150,13 @@ void APIResolver::LoadModules()
     //tools.ShowError("Failed to get handle to Ntdll");
 }
 
-
 void API::APIResolver::IATCamo()
 {
     PVOID		pAddress = NULL;
-    int* A = (int*)_(&pAddress);
+    int* dummy = (int*)_(&pAddress);
 
     // This if statement will never run
-    if (*A > 350) {
+    if (*dummy > 350) {
 
         // Whitelisted Winapis
         unsigned __int64 i = MessageBoxA(NULL, NULL, NULL, NULL);
