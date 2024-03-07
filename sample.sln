@@ -8,9 +8,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "injector", "injector\inject
 		{025447E0-BAD1-43AE-86FE-F0480BF541A4} = {025447E0-BAD1-43AE-86FE-F0480BF541A4}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "shared", "shared\shared.vcxitems", "{7137F2FF-F309-4D3F-891B-8674118268ED}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "API", "API\API.vcxproj", "{025447E0-BAD1-43AE-86FE-F0480BF541A4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "core", "core\core.vcxproj", "{025447E0-BAD1-43AE-86FE-F0480BF541A4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,9 +40,5 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1D394FFC-2879-4578-9C22-151D1F4A2E6E}
-	EndGlobalSection
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		shared\shared.vcxitems*{5893f20c-4cb7-48be-9c69-d54a054c706b}*SharedItemsImports = 4
-		shared\shared.vcxitems*{7137f2ff-f309-4d3f-891b-8674118268ed}*SharedItemsImports = 9
 	EndGlobalSection
 EndGlobal

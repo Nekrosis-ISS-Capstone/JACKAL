@@ -89,15 +89,6 @@ void __cdecl memcpy(void* &dest, void* &src, size_t sz)
         }                                                                                   \
     }  
 
-class CRT
-{
-public:
-	void _memcpy(void* dest, void* src, size_t sz);
-	void* __cdecl _memset(void* dst, int value, size_t size);
-
-};
-
-
 
 class Logging
 {

@@ -55,25 +55,3 @@ void Logging::EnableDebugConsole() {
     }
 #endif
 }
-
-void* __cdecl CRT::_memset(void* dst, int value, size_t size)
-{
-    unsigned char* p = (unsigned char*)dst;
-
-    while (size > 0)
-    {
-        *p = (unsigned char)value;
-        p++;
-        size--;
-    }
-    return dst;
-}
-
-void CRT::_memcpy(void* dest, void* src, size_t sz)
-{
-    char* cpSrc = (char*)src;
-    char* cpDst = (char*)dest;
-
-    for (int i = 0; i < sz; i++)
-        cpDst[i] = cpSrc[i];
-}

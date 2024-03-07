@@ -15,12 +15,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="headers\api.h">
+    <ClInclude Include="API\headers\api.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="API\headers\api_functions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\headers\tools.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\api.cpp">
+    <ClCompile Include="API\src\api.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\src\tools.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

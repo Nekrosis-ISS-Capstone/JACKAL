@@ -23,9 +23,7 @@
 //
 
 
-
-
-#include "../shared/API/headers/api.h"
+#include <API/headers/api.h>
 #include <utils/headers/tools.h>
 #include <string>
 #include <sstream>
@@ -41,9 +39,6 @@ template <typename T, T Value>
 struct integral_constant {
     static constexpr T value = Value;
 };
-
-
-extern void* __cdecl memset(void*, int, size_t);
 
 // Generate seed for string hashing
 constexpr int API::RandomCompileTimeSeed(void)
@@ -74,11 +69,11 @@ constexpr DWORD API::HashStringDjb2A(const char* string) {
 namespace hashes
 {
     constexpr DWORD NtQueryInformationProcess = integral_constant<DWORD, HashStringDjb2A("NtQueryInformationProcess")>::value;
-    constexpr DWORD NtCreateProcess           = integral_constant<DWORD, HashStringDjb2A("NtCreateProcess")>::value;
-    constexpr DWORD NtTerminateProcess        = integral_constant<DWORD, HashStringDjb2A("NtTerminateProcess")>::value;
-    constexpr DWORD NtCreateThread            = integral_constant<DWORD, HashStringDjb2A("NtCreateThread")>::value;
-    constexpr DWORD LdrLoadDll                = integral_constant<DWORD, HashStringDjb2A("LdrLoadDll")>::value;
-    constexpr DWORD NtOpenProcess             = integral_constant<DWORD, HashStringDjb2A("NtOpenProcess")>::value;
+    constexpr DWORD NtCreateProcess = integral_constant<DWORD, HashStringDjb2A("NtCreateProcess")>::value;
+    constexpr DWORD NtTerminateProcess = integral_constant<DWORD, HashStringDjb2A("NtTerminateProcess")>::value;
+    constexpr DWORD NtCreateThread = integral_constant<DWORD, HashStringDjb2A("NtCreateThread")>::value;
+    constexpr DWORD LdrLoadDll = integral_constant<DWORD, HashStringDjb2A("LdrLoadDll")>::value;
+    constexpr DWORD NtOpenProcess = integral_constant<DWORD, HashStringDjb2A("NtOpenProcess")>::value;
 };
 
 APIResolver::APIResolver()
@@ -141,14 +136,14 @@ void APIResolver::LoadModules()
     //Logging tools;
 
     this->api.mod.Kernel32 = LoadLibraryA("kernel32.dll");
-    this->api.mod.Ntdll    = LoadLibraryA("ntdll.dll");
+    this->api.mod.Ntdll = LoadLibraryA("ntdll.dll");
 
     if (!this->api.mod.Kernel32)
         //tools.ShowError("Failed to get handle to kernel32");
         return;
     if (!this->api.mod.Ntdll)
         return;
-        //tools.ShowError("Failed to get handle to Ntdll");
+    //tools.ShowError("Failed to get handle to Ntdll");
 }
 
 
@@ -191,14 +186,14 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
     //Logging tools; // For error reporting functionality
    // CRT     crt;   // Custom C runtime functions
 
-    PIMAGE_DOS_HEADER       pDosHeader  = nullptr;
-    PIMAGE_NT_HEADERS       pNtHeaders  = nullptr;
+    PIMAGE_DOS_HEADER       pDosHeader = nullptr;
+    PIMAGE_NT_HEADERS       pNtHeaders = nullptr;
     PIMAGE_FILE_HEADER      pFileHeader = nullptr;
-    PIMAGE_OPTIONAL_HEADER  pOptHeader  = nullptr;
-    PIMAGE_EXPORT_DIRECTORY pExportDir  = nullptr;
+    PIMAGE_OPTIONAL_HEADER  pOptHeader = nullptr;
+    PIMAGE_EXPORT_DIRECTORY pExportDir = nullptr;
 
     DWORD exports_size = NULL;
-    DWORD exports_rva  = NULL;
+    DWORD exports_rva = NULL;
 
     pDosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(pBaseAddr);
 
@@ -213,7 +208,7 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
 
     // Get File and Optional headers
     pFileHeader = &pNtHeaders->FileHeader;
-    pOptHeader  = &pNtHeaders->OptionalHeader;
+    pOptHeader = &pNtHeaders->OptionalHeader;
 
 
     // Verify that there is enough space for the NT headers
@@ -226,13 +221,13 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
     // Verify that the optional header contains enough data directories
     if (pOptHeader->NumberOfRvaAndSizes < IMAGE_DIRECTORY_ENTRY_EXPORT + 1)
     {
-       // tools.ShowError("Program Invalid: Insufficient data directories");
+        // tools.ShowError("Program Invalid: Insufficient data directories");
         return NULL;
     }
 
     // Get the size and virtual address of the export directory
     exports_size = pOptHeader->DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].Size;
-    exports_rva  = pOptHeader->DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
+    exports_rva = pOptHeader->DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
 
     // Verify that the export directory is within the image boundaries
     if (exports_rva + exports_size > pOptHeader->SizeOfImage)
@@ -241,8 +236,8 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
         return NULL;
     }
 
-    pExportDir   = reinterpret_cast<PIMAGE_EXPORT_DIRECTORY>(reinterpret_cast<char*>(pBaseAddr) + exports_rva);   // Get the RVA
-    DWORD* pEAT  = reinterpret_cast<DWORD*>(reinterpret_cast<char*>(pBaseAddr) + pExportDir->AddressOfFunctions); // Address of Export Address Table functions
+    pExportDir = reinterpret_cast<PIMAGE_EXPORT_DIRECTORY>(reinterpret_cast<char*>(pBaseAddr) + exports_rva);   // Get the RVA
+    DWORD* pEAT = reinterpret_cast<DWORD*>(reinterpret_cast<char*>(pBaseAddr) + pExportDir->AddressOfFunctions); // Address of Export Address Table functions
     DWORD* pENPT = reinterpret_cast<DWORD*>(reinterpret_cast<char*>(pBaseAddr) + pExportDir->AddressOfNames);     // Address of Export Name Pointer Table 
 
 
@@ -260,10 +255,10 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
             if (address >= reinterpret_cast<uintptr_t>(pExportDir) && address < reinterpret_cast<uintptr_t>(pExportDir) + exports_size)
             {
                 char cForwarderName[MAX_PATH] = { 0 };
-                DWORD dwDotOffset    = 0x00;
-                char* pcFunctionMod  = nullptr;
+                DWORD dwDotOffset = 0x00;
+                char* pcFunctionMod = nullptr;
                 char* pcFunctionName = nullptr;
-                
+
                 memcpy(cForwarderName, reinterpret_cast<void*>(address), strlen(reinterpret_cast<char*>(address)));
 
                 for (int j = 0; j < strlen(cForwarderName); j++)
