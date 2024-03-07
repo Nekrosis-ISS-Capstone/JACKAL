@@ -4,17 +4,53 @@
 
 //import MyModule;
 
+
+class Singleton
+{
+public:
+	Singleton(const Singleton&) = delete;
+
+	static Singleton& GetInstance()
+	{
+		/*static Singleton instance;*/
+		return instance;
+	}
+	void func() {};
+
+private:
+	Singleton() {}
+	
+
+	static Singleton instance;
+
+
+};
+Singleton Singleton::instance;
+
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	//int x = MyFunc(1);
 
-	API::APIResolver resolver;
+	//auto& singleton = Singleton::GetInstance();
+
+	//singleton.func();
+
+	auto& resolver = API::APIResolver::GetInstance();
+	//resolver.IATCamo();
+	//resolver.LoadModules();
+	//resolver.ResolveFunctions();
+
+	auto resolved    = resolver.GetAPIAccess();
 
 	AntiAnalysis debug;
 
 	debug.PebCheck(resolver);
 
-	MessageBoxA(NULL, "working", "working", NULL);
+	if(!resolved.func.pNtCreateProcess)
+		MessageBoxA(NULL, "not working", "working", NULL);
+
+
 
 	return 0;
 } 

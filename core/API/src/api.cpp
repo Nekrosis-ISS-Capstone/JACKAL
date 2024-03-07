@@ -41,6 +41,9 @@ struct integral_constant {
     static constexpr T value = Value;
 };
 
+API::APIResolver API::APIResolver::instance;
+
+
 // Generate seed for string hashing
 consteval int API::RandomCompileTimeSeed(void)
 {
@@ -86,7 +89,7 @@ APIResolver::APIResolver()
 {
     this->IATCamo();
     this->LoadModules();
-    this->ResolveFunctions(api.mod);
+    this->ResolveFunctions();
 }
 APIResolver::~APIResolver()
 {
@@ -94,13 +97,19 @@ APIResolver::~APIResolver()
 }
 
 
+APIResolver& API::APIResolver::GetInstance() 
+{
+    return instance;
+}
+
 const API_ACCESS& APIResolver::GetAPIAccess() const
 {
     return api;
 }
 
+
 // This function will resolve all of the functions in our API_FUNCTIONS struct
-void APIResolver::ResolveFunctions(API_MODULES hModuleHandle)
+void APIResolver::ResolveFunctions()
 {
     //Logging tools;
 
@@ -256,15 +265,15 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
         if (HashStringDjb2A(szNames) == func)
         {
             unsigned short usOrdinal = reinterpret_cast<unsigned short*>(pBaseAddr + pExportDir->AddressOfNameOrdinals)[i];
-            uintptr_t address = reinterpret_cast<uintptr_t>(pBaseAddr + reinterpret_cast<unsigned long*>(pBaseAddr + pExportDir->AddressOfFunctions)[usOrdinal]);
+            uintptr_t address        = reinterpret_cast<uintptr_t>      (pBaseAddr + reinterpret_cast<unsigned long*>(pBaseAddr + pExportDir->AddressOfFunctions)[usOrdinal]);
 
             // Check if the function is forwarded
             if (address >= reinterpret_cast<uintptr_t>(pExportDir) && address < reinterpret_cast<uintptr_t>(pExportDir) + exports_size)
             {
                 char cForwarderName[MAX_PATH] = { 0 };
-                DWORD dwDotOffset = 0x00;
-                char* pcFunctionMod = nullptr;
-                char* pcFunctionName = nullptr;
+                char* pcFunctionMod           = nullptr;
+                char* pcFunctionName          = nullptr;
+                DWORD dwDotOffset             = 0x00;
 
                 memcpy(cForwarderName, reinterpret_cast<void*>(address), strlen(reinterpret_cast<char*>(address)));
 
@@ -278,7 +287,7 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
                     }
                 }
 
-                pcFunctionMod = cForwarderName;
+                pcFunctionMod  = cForwarderName;
                 pcFunctionName = cForwarderName + dwDotOffset + 1;
 
                 return GetProcessAddressByHash(LoadLibraryA(pcFunctionMod), HashStringDjb2A(pcFunctionName)); // TODO: use pLdrLoadDll

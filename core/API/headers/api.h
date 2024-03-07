@@ -60,24 +60,30 @@ namespace API
 
 	// ---------------------------------
 
-
 	// Get process address by hash
 	uintptr_t GetProcessAddressByHash(void* pBase, DWORD func);
 
 	class APIResolver
 	{
 	public:
-		APIResolver();
+		APIResolver(APIResolver&) = delete;
 		~APIResolver();
 
-		void IATCamo();
 		void FreeModules();
 		const API_ACCESS& GetAPIAccess() const;
+		static APIResolver& GetInstance();
+
 	private:
+
+
+		APIResolver(); // Private constructor to ensure single instance of the class
+
 		PVOID _(PVOID* ppAddress);
 		void LoadModules();
-		void ResolveFunctions(API_MODULES pModules);
+		void ResolveFunctions();
+		void IATCamo();
 
+		static APIResolver instance; // An instance of this class
 		API_ACCESS api;
 	};
 }
