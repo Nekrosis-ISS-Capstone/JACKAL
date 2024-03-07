@@ -25,6 +25,7 @@
 
 #include <API/headers/api.h>
 #include <utils/headers/tools.h>
+#include <utils/headers/CRTdefs.h>
 #include <string>
 #include <sstream>
 #include <cstdint>

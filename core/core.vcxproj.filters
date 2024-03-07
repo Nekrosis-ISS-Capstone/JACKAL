@@ -24,12 +24,21 @@
     <ClInclude Include="utils\headers\tools.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="utils\headers\antianalysis.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\headers\CRTdefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="API\src\api.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="utils\src\tools.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\src\antianalysis.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
