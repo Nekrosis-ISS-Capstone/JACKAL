@@ -4,22 +4,13 @@
 
 import MyModule;
 
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	AntiAnalysis debug;
 	//int x = MyFunc(1);
 
-	//auto resolved = UseResolver();
+	auto resolved = UseResolver();
 
-	auto& resolver = API::APIResolver::GetInstance();
-	auto resolved	  = resolver.GetAPIAccess();
-
-	resolver.IATCamo();
-	resolver.LoadModules();
-	resolver.ResolveFunctions();
-
-
+	AntiAnalysis debug;
 	auto& resolver = API::APIResolver::GetInstance();
 	debug.PebCheck(resolver);
 
