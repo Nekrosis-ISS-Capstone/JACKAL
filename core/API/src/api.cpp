@@ -85,21 +85,15 @@ namespace hashes
 
 };
 
-APIResolver::APIResolver()
-{
-    this->IATCamo();
-    this->LoadModules();
-    this->ResolveFunctions();
-}
+//APIResolver::APIResolver()
+//{
+//    this->IATCamo();
+//    this->LoadModules();
+//    this->ResolveFunctions();
+//}
 APIResolver::~APIResolver()
 {
     FreeModules();
-}
-
-
-APIResolver& API::APIResolver::GetInstance() 
-{
-    return instance;
 }
 
 const API_ACCESS& APIResolver::GetAPIAccess() const

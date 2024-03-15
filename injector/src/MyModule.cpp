@@ -1,14 +1,17 @@
-
 //#include <Windows.h>
+#include "API/headers/api.h"
 module MyModule;
 
 
 
-int MyFunc(int x)
+API::API_ACCESS UseResolver()
 {
-	int y = 0;
+	auto& resolver = API::APIResolver::GetInstance();
+	resolver.IATCamo();
+	resolver.LoadModules();
+	resolver.ResolveFunctions();
 
-	int z = x + y;
+	auto resolved = resolver.GetAPIAccess();
 
-	return z;
+	return resolved;
 }

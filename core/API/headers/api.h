@@ -66,22 +66,27 @@ namespace API
 	class APIResolver
 	{
 	public:
-		APIResolver(APIResolver&) = delete;
+		APIResolver(const APIResolver&) = delete;
 		~APIResolver();
 
 		void FreeModules();
 		const API_ACCESS& GetAPIAccess() const;
-		static APIResolver& GetInstance();
+		static APIResolver& GetInstance() {return instance;}
+
+		void LoadModules();
+		void ResolveFunctions();
+		void IATCamo();
 
 	private:
 
 
-		APIResolver(); // Private constructor to ensure single instance of the class
+		APIResolver() {
+			this->IATCamo();
+			this->LoadModules();
+			this->ResolveFunctions();
+		}; // Private constructor to ensure single instance of the class
 
 		PVOID _(PVOID* ppAddress);
-		void LoadModules();
-		void ResolveFunctions();
-		void IATCamo();
 
 		static APIResolver instance; // An instance of this class
 		API_ACCESS api;

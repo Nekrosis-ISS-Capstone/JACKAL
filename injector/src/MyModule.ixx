@@ -1,3 +1,5 @@
+#include "API/headers/api.h"
+
 export module MyModule;
 
-export int MyFunc(int x);
+export API::API_ACCESS UseResolver();

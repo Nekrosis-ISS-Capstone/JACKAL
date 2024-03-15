@@ -2,49 +2,25 @@
 #include <API/headers/api.h>
 #include "utils/headers/antianalysis.h"
 
-//import MyModule;
-
-
-class Singleton
-{
-public:
-	Singleton(const Singleton&) = delete;
-
-	static Singleton& GetInstance()
-	{
-		/*static Singleton instance;*/
-		return instance;
-	}
-	void func() {};
-
-private:
-	Singleton() {}
-	
-
-	static Singleton instance;
-
-
-};
-Singleton Singleton::instance;
+import MyModule;
 
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	AntiAnalysis debug;
 	//int x = MyFunc(1);
 
-	//auto& singleton = Singleton::GetInstance();
-
-	//singleton.func();
+	//auto resolved = UseResolver();
 
 	auto& resolver = API::APIResolver::GetInstance();
-	//resolver.IATCamo();
-	//resolver.LoadModules();
-	//resolver.ResolveFunctions();
+	auto resolved	  = resolver.GetAPIAccess();
 
-	auto resolved    = resolver.GetAPIAccess();
+	resolver.IATCamo();
+	resolver.LoadModules();
+	resolver.ResolveFunctions();
 
-	AntiAnalysis debug;
 
+	auto& resolver = API::APIResolver::GetInstance();
 	debug.PebCheck(resolver);
 
 	if(!resolved.func.pNtCreateProcess)
