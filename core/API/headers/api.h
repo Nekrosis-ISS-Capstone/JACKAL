@@ -70,7 +70,7 @@ namespace API
 		~APIResolver();
 
 		void FreeModules();
-		const API_ACCESS& GetAPIAccess() const;
+		const  API_ACCESS&  GetAPIAccess() const;
 		static APIResolver& GetInstance() {return instance;}
 
 		void LoadModules();
@@ -78,8 +78,6 @@ namespace API
 		void IATCamo();
 
 	private:
-
-
 		APIResolver() {
 			this->IATCamo();
 			this->LoadModules();

