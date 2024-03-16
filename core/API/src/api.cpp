@@ -1,28 +1,5 @@
 // This file contains the function pointers to the ntapi/win32 api functions that are to be dynamically resolved at runtime
 
-// singleton 
-
-//
-//class APIResolver {
-//private:
-//    // Private constructor to prevent instantiation
-//    APIResolver() {}
-//
-//public:
-//    // Static method to get the single instance of APIResolver
-//    static APIResolver& getInstance() {
-//        static APIResolver instance;
-//        return instance;
-//    }
-//
-//    // Other member functions...
-//};
-//
-//// Usage:
-//auto& resolver = APIResolver::getInstance();
-//
-
-
 #include <API/headers/api.h>
 #include <utils/headers/tools.h>
 #include <utils/headers/CRTdefs.h>
@@ -82,6 +59,8 @@ namespace hashes
 
     /* KERNEL32 */
     constexpr DWORD SetFileInformationByHandle = integral_constant<DWORD, HashStringDjb2A("SetFileInformationByHandle")>::value;
+    constexpr DWORD GetCurrentProcess          = integral_constant<DWORD, HashStringDjb2A("GetCurrentProcess")>::value;
+
 
 };
 
@@ -91,6 +70,7 @@ namespace hashes
 //    this->LoadModules();
 //    this->ResolveFunctions();
 //}
+
 APIResolver::~APIResolver()
 {
     FreeModules();
@@ -142,6 +122,7 @@ PVOID API::APIResolver::_(PVOID* ppAddress)
     return pAddress;
 }
 
+
 void APIResolver::LoadModules()
 {
     //Logging tools;
@@ -192,9 +173,6 @@ void APIResolver::FreeModules()
 uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
 {
     unsigned char* pBaseAddr = reinterpret_cast<unsigned char*>(pBase);
-
-    //Logging tools; // For error reporting functionality
-   // CRT     crt;   // Custom C runtime functions
 
     PIMAGE_DOS_HEADER       pDosHeader  = nullptr;
     PIMAGE_NT_HEADERS       pNtHeaders  = nullptr;
@@ -267,7 +245,7 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
                 char cForwarderName[MAX_PATH] = { 0 };
                 char* pcFunctionMod           = nullptr;
                 char* pcFunctionName          = nullptr;
-                DWORD dwDotOffset             = 0x00;
+                DWORD dwDotOffset             = 0x0;
 
                 memcpy(cForwarderName, reinterpret_cast<void*>(address), strlen(reinterpret_cast<char*>(address)));
 

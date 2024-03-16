@@ -6,12 +6,15 @@ import MyModule;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	//int x = MyFunc(1);
-
-	auto resolved = UseResolver();
-
 	AntiAnalysis debug;
+
 	auto& resolver = API::APIResolver::GetInstance();
+	auto resolved	  = resolver.GetAPIAccess();
+
+	resolver.IATCamo();
+	resolver.LoadModules();
+	resolver.ResolveFunctions();
+
 	debug.PebCheck(resolver);
 
 	if(!resolved.func.pNtCreateProcess)

