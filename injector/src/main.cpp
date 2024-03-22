@@ -17,10 +17,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	debug.PebCheck(resolver);
 
-	if(!resolved.func.pNtCreateProcess)
-		MessageBoxA(NULL, "not working", "working", NULL);
-
-
 
 	return 0;
 } 

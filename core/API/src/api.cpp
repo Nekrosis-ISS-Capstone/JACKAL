@@ -103,6 +103,7 @@ void APIResolver::ResolveFunctions()
     api.func.pLdrLoadDll                 = reinterpret_cast<pLdrLoadDll_t>                (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::LdrLoadDll));
     api.func.pNtOpenProcess              = reinterpret_cast<pNtOpenProcess_t>             (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtOpenProcess));
 
+
     api.func.pSetFileInformationByHandle = reinterpret_cast<pSetFileInformationByHandle_t>(GetProcessAddressByHash(this->api.mod.Kernel32, hashes::SetFileInformationByHandle));
 
 
@@ -128,7 +129,7 @@ void APIResolver::LoadModules()
     //Logging tools;
 
     this->api.mod.Kernel32 = LoadLibraryA("kernel32.dll");
-    this->api.mod.Ntdll = LoadLibraryA("ntdll.dll");
+    this->api.mod.Ntdll    = LoadLibraryA("ntdll.dll");
 
     if (!this->api.mod.Kernel32)
         //tools.ShowError("Failed to get handle to kernel32");
