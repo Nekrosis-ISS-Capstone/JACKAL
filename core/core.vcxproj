@@ -28,6 +28,7 @@
   <ItemGroup>
     <ClCompile Include="API\src\api.cpp" />
     <ClCompile Include="utils\src\antianalysis.cpp" />
+    <ClCompile Include="utils\src\CRTdefs.cpp" />
     <ClCompile Include="utils\src\tools.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
