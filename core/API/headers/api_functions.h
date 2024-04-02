@@ -56,6 +56,26 @@ typedef NTSTATUS(__stdcall* pLdrLoadDll_t)(
 	_Out_	  PHANDLE		  moduleHandle);
 
 
+typedef NTSTATUS(__stdcall* pNtCreateFile_t)(
+	_Out_	 PHANDLE FileHandle,
+	_In_	 ACCESS_MASK DesiredAccess,
+	_In_	 POBJECT_ATTRIBUTES ObjectAttributes,
+	_Out_	 PIO_STATUS_BLOCK IoStatusBlock,
+	_In_opt_ PLARGE_INTEGER AllocationSize,
+	_In_	 ULONG FileAttributes,
+	_In_	 ULONG ShareAccess,
+	_In_	 ULONG CreateDisposition,
+	_In_	 ULONG	CreateOptions,
+	_In_reads_bytes_opt_(EaLength) PVOID EaBuffer,
+	_In_	 ULONG EaLength
+	);
+
+
+typedef void(__stdcall* RtlInitUnicodeString_t)(
+	PUNICODE_STRING DestinationString,
+	PCWSTR          SourceString
+	);
+
 
 // END NTDLL
 

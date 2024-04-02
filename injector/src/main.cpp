@@ -1,5 +1,5 @@
 #include "Windows.h"
-#include <API/headers/api.h>
+#include "API/headers/api.h"
 #include "utils/headers/antianalysis.h"
 
 import MyModule;
@@ -16,7 +16,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	resolver.ResolveFunctions();
 
 	debug.PebCheck(resolver);
-
 
 	return 0;
 } 

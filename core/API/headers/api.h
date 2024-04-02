@@ -9,6 +9,8 @@
 #include <API/headers/api_functions.h>
 
 
+
+
 namespace API
 {
 	//typedef struct
@@ -37,6 +39,11 @@ namespace API
 		pNtCreateThread_t			 pNtCreateThread;
 		pLdrLoadDll_t				 pLdrLoadDll;
 		pNtOpenProcess_t			 pNtOpenProcess;
+		pNtCreateFile_t			     pNtCreateFile;
+
+		RtlInitUnicodeString_t		 RtlInitUnicodeString;
+
+
 
 		/* KERNEL32 */
 

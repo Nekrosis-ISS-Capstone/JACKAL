@@ -56,6 +56,8 @@ namespace hashes
     constexpr DWORD NtCreateThread             = integral_constant<DWORD, HashStringDjb2A("NtCreateThread")>::value;
     constexpr DWORD LdrLoadDll                 = integral_constant<DWORD, HashStringDjb2A("LdrLoadDll")>::value;
     constexpr DWORD NtOpenProcess              = integral_constant<DWORD, HashStringDjb2A("NtOpenProcess")>::value;
+    constexpr DWORD NtCreateFile               = integral_constant<DWORD, HashStringDjb2A("NtCreateFile")>::value;
+    constexpr DWORD RtlInitUnicodeString       = integral_constant<DWORD, HashStringDjb2A("RtlInitUnicodeString")>::value;
 
     /* KERNEL32 */
     constexpr DWORD SetFileInformationByHandle = integral_constant<DWORD, HashStringDjb2A("SetFileInformationByHandle")>::value;
@@ -102,7 +104,8 @@ void APIResolver::ResolveFunctions()
     api.func.pNtCreateThread             = reinterpret_cast<pNtCreateThread_t>            (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateThread));
     api.func.pLdrLoadDll                 = reinterpret_cast<pLdrLoadDll_t>                (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::LdrLoadDll));
     api.func.pNtOpenProcess              = reinterpret_cast<pNtOpenProcess_t>             (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtOpenProcess));
-
+    api.func.pNtCreateFile               = reinterpret_cast<pNtCreateFile_t>              (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateFile));
+    api.func.RtlInitUnicodeString        = reinterpret_cast<RtlInitUnicodeString_t>       (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::RtlInitUnicodeString));
 
     api.func.pSetFileInformationByHandle = reinterpret_cast<pSetFileInformationByHandle_t>(GetProcessAddressByHash(this->api.mod.Kernel32, hashes::SetFileInformationByHandle));
 
