@@ -9,6 +9,9 @@
 #define C_PTR( x )      ( PVOID )     ( x )         // Type-cast to PVOID
 #define U_PTR( x )      ( ULONG_PTR ) ( x )         // Type-cast to ULONG_PTR
 
+#define NtCurrentProcess() ((HANDLE)(LONG_PTR)-1)
+
+
 //extern void* __cdecl memset(void*, int, size_t);
 
 // Force compiler to use our versions of crt functions

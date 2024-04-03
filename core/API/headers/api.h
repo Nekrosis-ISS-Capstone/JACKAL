@@ -33,13 +33,18 @@ namespace API
 	typedef struct API_FUNCTIONS
 	{
 		/* NTDLL */
-		pNtQueryInformationProcess_t pNtQueryInformationProcess;
-		pNtCreateProcess_t			 pNtCreateProcess;
-		pNtTerminateProcess_t		 pNtTerminateProcess;
-		pNtCreateThread_t			 pNtCreateThread;
-		pLdrLoadDll_t				 pLdrLoadDll;
-		pNtOpenProcess_t			 pNtOpenProcess;
-		pNtCreateFile_t			     pNtCreateFile;
+		NtQueryInformationProcess_t  pNtQueryInformationProcess;
+		NtCreateProcess_t			 pNtCreateProcess;
+		NtTerminateProcess_t		 pNtTerminateProcess;
+		NtCreateThread_t			 pNtCreateThread;
+		LdrLoadDll_t				 pLdrLoadDll;
+		NtOpenProcess_t				 pNtOpenProcess;
+		NtCreateFile_t			     pNtCreateFile;
+		NtAllocateVirtualMemory_t    pNtAllocateVirtualMemory;
+		NtProtectVirtualMemory_t	 pNtProtectVirtualMemory;
+		NtFlushInstructionCache_t	 pNtFlushInstructionCache;
+		LdrGetProcedureAddress_t     pLdrGetProcedureAddress;
+		
 
 		RtlInitUnicodeString_t		 RtlInitUnicodeString;
 

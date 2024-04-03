@@ -58,6 +58,10 @@ namespace hashes
     constexpr DWORD NtOpenProcess              = integral_constant<DWORD, HashStringDjb2A("NtOpenProcess")>::value;
     constexpr DWORD NtCreateFile               = integral_constant<DWORD, HashStringDjb2A("NtCreateFile")>::value;
     constexpr DWORD RtlInitUnicodeString       = integral_constant<DWORD, HashStringDjb2A("RtlInitUnicodeString")>::value;
+    constexpr DWORD NtAllocateVirtualMemory    = integral_constant<DWORD, HashStringDjb2A("NtAllocateVirtualMemory")>::value;
+    constexpr DWORD NtProtectVirtualMemory     = integral_constant<DWORD, HashStringDjb2A("NtProtectVirtualMemory")>::value;
+    constexpr DWORD NtFlushInstructionCache    = integral_constant<DWORD, HashStringDjb2A("NtFlushInstructionCache")>::value;
+    constexpr DWORD LdrGetProcedureAddress     = integral_constant<DWORD, HashStringDjb2A("LdrGetProcedureAddress")>::value;
 
     /* KERNEL32 */
     constexpr DWORD SetFileInformationByHandle = integral_constant<DWORD, HashStringDjb2A("SetFileInformationByHandle")>::value;
@@ -65,13 +69,6 @@ namespace hashes
 
 
 };
-
-//APIResolver::APIResolver()
-//{
-//    this->IATCamo();
-//    this->LoadModules();
-//    this->ResolveFunctions();
-//}
 
 APIResolver::~APIResolver()
 {
@@ -87,29 +84,19 @@ const API_ACCESS& APIResolver::GetAPIAccess() const
 // This function will resolve all of the functions in our API_FUNCTIONS struct
 void APIResolver::ResolveFunctions()
 {
-    //Logging tools;
-
-
-    //   // Map function names to function pointers
-    //std::unordered_map<std::string, std::function<void* ()>> functionMap = 
-    //{
-    //    {hashes::NtQueryInformationProcess, []() { return GetProcessAddressByHash(api.mod.Ntdll, hashes::NtQueryInformationProcess); }},
-    //    {hashes::NtCreateProcess, []() { return GetProcessAddressByHash(api.mod.Ntdll, hashes::NtCreateProcess); }},
-    //    {hashes::NtCreateThread, []() { return GetProcessAddressByHash(api.mod.Ntdll, hashes::NtCreateThread); }},
-    //    {hashes::LdrLoadDll, []() { return GetProcessAddressByHash(this->api.mod.Ntdll, hashes::LdrLoadDll); }},
-    //};
-
-    api.func.pNtQueryInformationProcess  = reinterpret_cast<pNtQueryInformationProcess_t> (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtQueryInformationProcess));
-    api.func.pNtCreateProcess            = reinterpret_cast<pNtCreateProcess_t>           (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateProcess));
-    api.func.pNtCreateThread             = reinterpret_cast<pNtCreateThread_t>            (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateThread));
-    api.func.pLdrLoadDll                 = reinterpret_cast<pLdrLoadDll_t>                (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::LdrLoadDll));
-    api.func.pNtOpenProcess              = reinterpret_cast<pNtOpenProcess_t>             (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtOpenProcess));
-    api.func.pNtCreateFile               = reinterpret_cast<pNtCreateFile_t>              (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateFile));
-    api.func.RtlInitUnicodeString        = reinterpret_cast<RtlInitUnicodeString_t>       (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::RtlInitUnicodeString));
+    api.func.pNtQueryInformationProcess  = reinterpret_cast<NtQueryInformationProcess_t> (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtQueryInformationProcess));
+    api.func.pNtCreateProcess            = reinterpret_cast<NtCreateProcess_t>           (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateProcess));
+    api.func.pNtCreateThread             = reinterpret_cast<NtCreateThread_t>            (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateThread));
+    api.func.pLdrLoadDll                 = reinterpret_cast<LdrLoadDll_t>                (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::LdrLoadDll));
+    api.func.pNtOpenProcess              = reinterpret_cast<NtOpenProcess_t>             (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtOpenProcess));
+    api.func.pNtCreateFile               = reinterpret_cast<NtCreateFile_t>              (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateFile));
+    api.func.RtlInitUnicodeString        = reinterpret_cast<RtlInitUnicodeString_t>      (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::RtlInitUnicodeString));
+    api.func.pNtAllocateVirtualMemory    = reinterpret_cast<NtAllocateVirtualMemory_t>   (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtAllocateVirtualMemory));
+    api.func.pNtProtectVirtualMemory     = reinterpret_cast<NtProtectVirtualMemory_t>    (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtProtectVirtualMemory));
+    api.func.pNtFlushInstructionCache    = reinterpret_cast<NtFlushInstructionCache_t>   (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtFlushInstructionCache));
+    api.func.pLdrGetProcedureAddress     = reinterpret_cast<LdrGetProcedureAddress_t>    (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::LdrGetProcedureAddress));
 
     api.func.pSetFileInformationByHandle = reinterpret_cast<pSetFileInformationByHandle_t>(GetProcessAddressByHash(this->api.mod.Kernel32, hashes::SetFileInformationByHandle));
-
-
 }
 
 PVOID API::APIResolver::_(PVOID* ppAddress)
@@ -129,17 +116,14 @@ PVOID API::APIResolver::_(PVOID* ppAddress)
 
 void APIResolver::LoadModules()
 {
-    //Logging tools;
-
     this->api.mod.Kernel32 = LoadLibraryA("kernel32.dll");
     this->api.mod.Ntdll    = LoadLibraryA("ntdll.dll");
+    
 
     if (!this->api.mod.Kernel32)
-        //tools.ShowError("Failed to get handle to kernel32");
         return;
     if (!this->api.mod.Ntdll)
         return;
-    //tools.ShowError("Failed to get handle to Ntdll");
 }
 
 void API::APIResolver::IATCamo()

@@ -37,7 +37,6 @@ bool AntiAnalysis::Peb(API::APIResolver& resolver)
 bool AntiAnalysis::PebCheck(API::APIResolver& resolver)
 {
     if (Peb(resolver)) {
-        //MessageBoxA(NULL, "debugger", "debugger", NULL);
         this->Nuke(resolver);
         ExitProcess(0);
     }
