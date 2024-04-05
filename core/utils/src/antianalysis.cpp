@@ -1,6 +1,7 @@
 #pragma once
 #include "utils/headers/antianalysis.h"
 #include "utils/headers/Tools.h"
+#include "utils/headers/CRTdefs.h"
 
 #define NEW_STREAM L":a"
 
@@ -9,7 +10,7 @@ bool AntiAnalysis::CheckPebForDebug(API::APIResolver& resolver)
     PROCESS_BASIC_INFORMATION pbi;
 
     API::API_ACCESS api = resolver.GetAPIAccess();
-    HANDLE hProcess     = GetCurrentProcess();
+    HANDLE hProcess     = NtCurrentProcess();
 
     if (api.func.pNtQueryInformationProcess)
     {

@@ -2,14 +2,8 @@
 #include <Windows.h>
 #include <stddef.h>
 
-#define MemCopy         __movsb                                                // Replacing memcpy
-#define MemSet          __stosb                                                // Replacing memset
-#define MemZero( p, l ) __stosb( ( char* ) ( ( PVOID ) p ), 0, l )             // Replacing ZeroMemory   
-
-#define C_PTR( x )      ( PVOID )     ( x )         // Type-cast to PVOID
-#define U_PTR( x )      ( ULONG_PTR ) ( x )         // Type-cast to ULONG_PTR
-
 #define NtCurrentProcess() ((HANDLE)(LONG_PTR)-1)
+#define NtCurrentThread()  ((HANDLE)-2)
 
 
 //extern void* __cdecl memset(void*, int, size_t);

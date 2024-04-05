@@ -195,8 +195,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\MyModule.cpp" />
-    <ClCompile Include="src\MyModule.ixx" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\payload.cpp" />
   </ItemGroup>

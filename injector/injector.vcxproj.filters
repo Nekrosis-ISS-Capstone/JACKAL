@@ -2,8 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\MyModule.ixx" />
-    <ClCompile Include="src\MyModule.cpp" />
     <ClCompile Include="src\payload.cpp" />
   </ItemGroup>
   <ItemGroup>

