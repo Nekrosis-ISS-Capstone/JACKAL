@@ -15,7 +15,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	resolver.LoadModules();
 	resolver.ResolveFunctions();
 
-	debug.PebCheck(resolver);
+	debug.IsBeingWatched(resolver);
 
 	return 0;
 } 

@@ -8,9 +8,9 @@
 // Implementation of the atexit function
 int atexit(void (*function)(void)) {
 	// Check if there is space in the array
-	if (num_atexit_funcs < MAX_ATEXIT_FUNCS) {
+	if (sAtExitFuncs < MAX_ATEXIT_FUNCS) {
 		// Add the function to the array
-		atexit_funcs[num_atexit_funcs++].func = function;
+		AtExitFuncs[sAtExitFuncs++].func = function;
 		return 0; // Success
 	}
 	else {
@@ -21,8 +21,8 @@ int atexit(void (*function)(void)) {
 // Function to call all registered functions on program exit
 void call_atexit_funcs() {
 	// Call each registered function in reverse order
-	for (size_t i = num_atexit_funcs; i > 0; --i) {
-		atexit_funcs[i - 1].func();
+	for (size_t i = sAtExitFuncs; i > 0; --i) {
+		AtExitFuncs[i - 1].func();
 	}
 }
 

@@ -40,8 +40,8 @@ struct AtExitFunc {
 };
 
 // Define an array to hold the registered functions
-static struct AtExitFunc atexit_funcs[MAX_ATEXIT_FUNCS];
-static size_t num_atexit_funcs = 0;
+static struct AtExitFunc AtExitFuncs[MAX_ATEXIT_FUNCS];
+static size_t sAtExitFuncs = 0;
 
 // Implementation of the atexit function
 int atexit(void (*function)(void));

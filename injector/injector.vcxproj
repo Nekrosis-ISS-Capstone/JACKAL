@@ -198,7 +198,7 @@
     <ClCompile Include="src\MyModule.cpp" />
     <ClCompile Include="src\MyModule.ixx" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\reflection.cpp" />
+    <ClCompile Include="src\payload.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\core\core.vcxproj">
@@ -206,7 +206,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="headers\reflection.h" />
+    <ClInclude Include="headers\payload.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

