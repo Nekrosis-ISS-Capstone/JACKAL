@@ -8,29 +8,6 @@
 #include <Windows.h>
 #include <API/headers/api_functions.h>
 
-namespace hashes
-{
-	/* NTDLL */
-	constexpr DWORD NtQueryInformationProcess = integral_constant<DWORD, HashStringDjb2A("NtQueryInformationProcess")>::value;
-	constexpr DWORD NtCreateProcess			  = integral_constant<DWORD, HashStringDjb2A("NtCreateProcess")>::value;
-	constexpr DWORD NtCreateUserProcess		  = integral_constant<DWORD, HashStringDjb2A("NtCreateUserProcess")>::value;
-	constexpr DWORD NtTerminateProcess		  = integral_constant<DWORD, HashStringDjb2A("NtTerminateProcess")>::value;
-	constexpr DWORD NtCreateThread			  = integral_constant<DWORD, HashStringDjb2A("NtCreateThread")>::value;
-	constexpr DWORD LdrLoadDll				  = integral_constant<DWORD, HashStringDjb2A("LdrLoadDll")>::value;
-	constexpr DWORD NtOpenProcess			  = integral_constant<DWORD, HashStringDjb2A("NtOpenProcess")>::value;
-	constexpr DWORD NtCreateFile			  = integral_constant<DWORD, HashStringDjb2A("NtCreateFile")>::value;
-	constexpr DWORD RtlInitUnicodeString	  = integral_constant<DWORD, HashStringDjb2A("RtlInitUnicodeString")>::value;
-	constexpr DWORD NtAllocateVirtualMemory   = integral_constant<DWORD, HashStringDjb2A("NtAllocateVirtualMemory")>::value;
-	constexpr DWORD NtProtectVirtualMemory	  = integral_constant<DWORD, HashStringDjb2A("NtProtectVirtualMemory")>::value;
-	constexpr DWORD NtWriteVirtualMemory	  = integral_constant<DWORD, HashStringDjb2A("NtWriteVirtualMemory")>::value;
-	constexpr DWORD NtFlushInstructionCache   = integral_constant<DWORD, HashStringDjb2A("NtFlushInstructionCache")>::value;
-	constexpr DWORD LdrGetProcedureAddress    = integral_constant<DWORD, HashStringDjb2A("LdrGetProcedureAddress")>::value;
-
-	/* KERNEL32 */
-	constexpr DWORD SetFileInformationByHandle = integral_constant<DWORD, HashStringDjb2A("SetFileInformationByHandle")>::value;
-
-};
-
 
 namespace API
 {

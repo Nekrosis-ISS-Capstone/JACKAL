@@ -37,21 +37,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	debug.IsBeingWatched(resolver); // Nuke self if in sandbox or debugger
 
-	//void* pFunctionToHook = GetProcAddress(GetModuleHandleA(TARGET_DLL), TARGET_FUNC);
+	void* pFunctionToHook = GetProcAddress(GetModuleHandleA(TARGET_DLL), TARGET_FUNC);
 
-	//if (pFunctionToHook == nullptr)
-	//	return -1;
+	if (pFunctionToHook == nullptr)
+		return -1;
 
-	//PatchHook(pFunctionToHook);
+	PatchHook(pFunctionToHook);
 
-	//HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, PID);
+	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, PID);
 
-	//if (hProcess == nullptr)
-	//	return -1;
+	if (hProcess == nullptr)
+		return -1;
 
-	//LocateMemoryGap(hProcess, &uAddress, reinterpret_cast<ULONG_PTR>(pFunctionToHook), sizeof(rawData) + sizeof(g_HookShellCode));
+	LocateMemoryGap(hProcess, &uAddress, reinterpret_cast<ULONG_PTR>(pFunctionToHook), sizeof(rawData) + sizeof(g_HookShellCode));
 
-	//InstallHook(hProcess, pFunctionToHook, reinterpret_cast<void*>(uAddress));
+	InstallHook(hProcess, pFunctionToHook, reinterpret_cast<void*>(uAddress));
 
 	return 0;
 } 
