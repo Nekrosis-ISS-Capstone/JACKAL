@@ -8,7 +8,8 @@
 #include "winternl.h"
 
 
-// dependancies
+// dependencies
+
 
 typedef enum _PS_CREATE_STATE
 {
@@ -255,12 +256,27 @@ typedef NTSTATUS(__stdcall* LdrGetProcedureAddress_t) (
 
 // KERNEL32
 
-typedef NTSTATUS (__stdcall* pSetFileInformationByHandle_t)(
+typedef NTSTATUS (__stdcall* SetFileInformationByHandle_t)(
 	_In_ HANDLE                    hFile,
 	_In_ FILE_INFO_BY_HANDLE_CLASS FileInformationClass,
 	_In_ LPVOID                    lpFileInformation,
 	_In_ DWORD                     dwBufferSize
 );
+//
+//typedef HANDLE(WINAPI* CreateToolhelp32Snapshot_t)(	
+//	_In_ DWORD dwFlags,
+//	_In_ DWORD th32ProcessID
+//);
+//
+//typedef BOOL(__stdcall* Process32First_t)(
+//	_In_	HANDLE			hSnapshot,
+//	_Inout_ PROCESSENTRY32_changed* lppe
+//);
+//
+//typedef BOOL(__stdcall* Process32Next_t)(
+//	_In_	HANDLE			hSnapshot,
+//	_Inout_ PROCESSENTRY32_changed* lppe
+//);
 
 // END KERNEL32
 

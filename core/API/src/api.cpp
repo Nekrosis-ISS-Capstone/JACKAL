@@ -77,6 +77,11 @@ namespace hashes
 
     /* KERNEL32 */
     constexpr DWORD SetFileInformationByHandle = integral_constant<DWORD, HashStringDjb2A("SetFileInformationByHandle")>::value;
+    //constexpr DWORD CreateToolhelp32Snapshot   = integral_constant<DWORD, HashStringDjb2A("CreateToolhelp32SnapShot")>::value;
+    //constexpr DWORD Process32First             = integral_constant<DWORD, HashStringDjb2A("Process32First")>::value;
+    //constexpr DWORD Process32Next              = integral_constant<DWORD, HashStringDjb2A("Process32Next")>::value;
+
+
 
 };
 
@@ -85,6 +90,7 @@ namespace hashes
 // This function will resolve all of the functions in our API_FUNCTIONS struct
 void APIResolver::ResolveFunctions()
 {
+    // NTDLL
     api.func.pNtQueryInformationProcess  = reinterpret_cast<NtQueryInformationProcess_t> (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtQueryInformationProcess));
     api.func.pNtCreateProcess            = reinterpret_cast<NtCreateProcess_t>           (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateProcess)); // Use NtCreateUserProcess instead
     api.func.pNtCreateUserProcess        = reinterpret_cast<NtCreateUserProcess_t>       (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateUserProcess));
@@ -99,7 +105,12 @@ void APIResolver::ResolveFunctions()
     api.func.pNtFlushInstructionCache    = reinterpret_cast<NtFlushInstructionCache_t>   (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtFlushInstructionCache));
     api.func.pLdrGetProcedureAddress     = reinterpret_cast<LdrGetProcedureAddress_t>    (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::LdrGetProcedureAddress));
 
-    api.func.pSetFileInformationByHandle = reinterpret_cast<pSetFileInformationByHandle_t>(GetProcessAddressByHash(this->api.mod.Kernel32, hashes::SetFileInformationByHandle));
+    // Kernel32
+    api.func.pSetFileInformationByHandle = reinterpret_cast<SetFileInformationByHandle_t>(GetProcessAddressByHash(this->api.mod.Kernel32, hashes::SetFileInformationByHandle));
+    //api.func.pCreateToolhelp32Snapshot   = reinterpret_cast<CreateToolhelp32Snapshot_t>  (GetProcessAddressByHash(this->api.mod.Kernel32, hashes::CreateToolhelp32Snapshot));
+    //api.func.pProcess32First             = reinterpret_cast<Process32First_t>            (GetProcessAddressByHash(this->api.mod.Kernel32, hashes::Process32First));
+    //api.func.pProcess32Next              = reinterpret_cast<Process32Next_t>             (GetProcessAddressByHash(this->api.mod.Kernel32, hashes::Process32Next));
+
 }
 
 void *API::APIResolver::_(void** ppAddress)

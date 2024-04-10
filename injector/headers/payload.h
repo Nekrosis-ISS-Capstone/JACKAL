@@ -1,9 +1,10 @@
 #pragma once
 #include "Windows.h"
+#include "API/headers/api.h"
 
 extern unsigned char g_HookShellCode[63];
 
-bool LocateMemoryGap(IN HANDLE hProcess, OUT ULONG_PTR* puAddress, IN ULONG_PTR uExportedFuncAddress, IN size_t sPayloadSize);
-bool InstallHook(IN HANDLE hProcess, IN void* pExportedFunc, IN void* pMainPayloadAddress);
-bool WritePayloadBuffer(IN HANDLE hProcess, IN ULONG_PTR uAddress, IN ULONG_PTR uHookShellcode, IN size_t sHookShellcodeSize, IN ULONG_PTR uPayloadBuffer, IN size_t sPayloadSize);
-void PatchHook(void* pExportedFunc);
+bool LocateMemoryGap   (HANDLE hProcess, _Out_ ULONG_PTR* puAddress, uintptr_t uExportedFuncAddress, size_t sPayloadSize, API::API_ACCESS& api);
+bool InstallHook	   (HANDLE hProcess, void* pExportedFunc, void* pMainPayloadAddress);
+bool WritePayloadBuffer(HANDLE hProcess, ULONG_PTR uAddress, ULONG_PTR uHookShellcode, size_t sHookShellcodeSize, ULONG_PTR uPayloadBuffer, size_t sPayloadSize);
+void PatchHook		   (void* pExportedFunc);

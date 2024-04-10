@@ -46,13 +46,19 @@ namespace API
 		LdrGetProcedureAddress_t     pLdrGetProcedureAddress;
 		
 
+
+		
+
 		RtlInitUnicodeString_t		 RtlInitUnicodeString;
 
 
 
 		/* KERNEL32 */
 
-		pSetFileInformationByHandle_t pSetFileInformationByHandle;
+		SetFileInformationByHandle_t pSetFileInformationByHandle;
+		//CreateToolhelp32Snapshot_t   pCreateToolhelp32Snapshot;
+		//Process32First_t			 pProcess32First;
+		//Process32First_t			 pProcess32Next;
 
 	}API_FUNCTIONS;
 
