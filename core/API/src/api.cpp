@@ -88,7 +88,7 @@ namespace hashes
 };
 
 // This function will resolve all of the functions in our API_FUNCTIONS struct
-void APIResolver::ResolveFunctions()
+void APIResolver::ResolveAPI()
 {
     // NTDLL
     api.func.pNtQueryInformationProcess  = reinterpret_cast<NtQueryInformationProcess_t> (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtQueryInformationProcess));

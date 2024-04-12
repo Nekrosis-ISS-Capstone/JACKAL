@@ -92,14 +92,14 @@ namespace API
 		static APIResolver& GetInstance() {return instance;}
 
 		void LoadModules();
-		void ResolveFunctions();
+		void ResolveAPI();
 		void IATCamo();
 
 	private:
 		APIResolver() {
 			this->IATCamo();
 			this->LoadModules();
-			this->ResolveFunctions();
+			this->ResolveAPI();
 		}; // Private constructor to ensure single instance of the class
 
 		PVOID _(PVOID* ppAddress);
