@@ -2,7 +2,7 @@
 #include <functional>
 #include <iostream>
 
-void Logging::ShowError(const char* error)
+void Tools::ShowError(const char* error)
 {
 #ifdef _DEBUG
     MessageBoxA(NULL, error, "Error", MB_ICONERROR | MB_OK);
@@ -41,7 +41,14 @@ void Logging::ShowError(const char* error)
 //}
 //
 
-void Logging::EnableDebugConsole() {
+void Tools::ExitProgram(const char* message)
+{
+    MessageBoxA(NULL, message, "error", MB_ICONWARNING);
+    ExitProcess(-1);
+}
+
+
+void Tools::EnableDebugConsole() {
 #ifdef _DEBUG
     if (AllocConsole()) {
         HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);

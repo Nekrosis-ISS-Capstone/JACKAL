@@ -5,7 +5,7 @@
 #include <Windows.h>
 #include <string>
 
-class Logging
+class Tools
 {
 public:
 	// These functions are for debug purposes
@@ -15,7 +15,7 @@ public:
 	void EnableDebugConsole();
 	void PrintConsole(std::string message);
 
-
+	void ExitProgram(const char* message);
 
 };
 #endif TOOLS_H // !TOOLS_H

