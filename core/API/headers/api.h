@@ -8,7 +8,6 @@
 #include <Windows.h>
 #include <API/headers/api_functions.h>
 
-
 namespace API
 {
 	//typedef struct
@@ -43,6 +42,7 @@ namespace API
 		NtProtectVirtualMemory_t	 pNtProtectVirtualMemory;
 		NtWriteVirtualMemory_t		 pNtWriteVirtualMemory;
 		NtFlushInstructionCache_t	 pNtFlushInstructionCache;
+		NtDelayExecution_t			 pNtDelayExecution;
 		LdrGetProcedureAddress_t     pLdrGetProcedureAddress;
 		
 
@@ -80,7 +80,7 @@ namespace API
 
 	// Get process address by hash
 	uintptr_t GetProcessAddressByHash(void* pBase, DWORD func);
-
+	
 	class APIResolver
 	{
 	public:
@@ -108,5 +108,8 @@ namespace API
 		API_ACCESS api;
 	};
 }
+
+
+
 
 #endif // !API_H

@@ -73,7 +73,9 @@ namespace hashes
     constexpr DWORD NtProtectVirtualMemory      = integral_constant<DWORD, HashStringDjb2A("NtProtectVirtualMemory")>::value;
     constexpr DWORD NtWriteVirtualMemory        = integral_constant<DWORD, HashStringDjb2A("NtWriteVirtualMemory")>::value;
     constexpr DWORD NtFlushInstructionCache     = integral_constant<DWORD, HashStringDjb2A("NtFlushInstructionCache")>::value;
+    constexpr DWORD NtDelayExecution            = integral_constant<DWORD, HashStringDjb2A("NtDelayExecution")>::value;
     constexpr DWORD LdrGetProcedureAddress      = integral_constant<DWORD, HashStringDjb2A("LdrGetProcedureAddress")>::value;
+
 
     /* KERNEL32 */
     constexpr DWORD SetFileInformationByHandle = integral_constant<DWORD, HashStringDjb2A("SetFileInformationByHandle")>::value;
@@ -84,8 +86,6 @@ namespace hashes
 
 
 };
-
-
 
 // This function will resolve all of the functions in our API_FUNCTIONS struct
 void APIResolver::ResolveFunctions()
@@ -103,6 +103,7 @@ void APIResolver::ResolveFunctions()
     api.func.pNtProtectVirtualMemory     = reinterpret_cast<NtProtectVirtualMemory_t>    (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtProtectVirtualMemory));
     api.func.pNtWriteVirtualMemory       = reinterpret_cast<NtWriteVirtualMemory_t>      (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtWriteVirtualMemory));
     api.func.pNtFlushInstructionCache    = reinterpret_cast<NtFlushInstructionCache_t>   (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtFlushInstructionCache));
+    api.func.pNtDelayExecution           = reinterpret_cast<NtDelayExecution_t>          (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtDelayExecution));
     api.func.pLdrGetProcedureAddress     = reinterpret_cast<LdrGetProcedureAddress_t>    (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::LdrGetProcedureAddress));
 
     // Kernel32

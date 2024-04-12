@@ -246,6 +246,11 @@ typedef NTSTATUS(__stdcall* LdrGetProcedureAddress_t) (
 	_Out_    PVOID*		  ProcedureAddress
 	);
 
+typedef NTSTATUS(__stdcall* NtDelayExecution_t)(
+	BOOLEAN              Alertable,
+	PLARGE_INTEGER       DelayInterval
+	);
+
 // END NTDLL
 
 
