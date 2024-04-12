@@ -17,6 +17,8 @@ public:
 
 	void ExitProgram(const char* message);
 
+	DWORD GetPID(const char* process);
+
 };
 #endif TOOLS_H // !TOOLS_H
 

