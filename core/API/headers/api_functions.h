@@ -118,12 +118,7 @@ typedef struct _PS_ATTRIBUTE_LIST
 } PS_ATTRIBUTE_LIST, * PPS_ATTRIBUTE_LIST;
 
 
-
-
-// end dependancies
-
-
-
+// end dependencies
 
 
 
@@ -157,7 +152,7 @@ typedef NTSTATUS(__stdcall* NtCreateProcess_t)(
 	_In_opt_ HANDLE				ExceptionPort);
 
 
-typedef NTSTATUS(__stdcall * NtCreateUserProcess_t)(
+typedef NTSTATUS(__stdcall* NtCreateUserProcess_t)(
 	_Out_ PHANDLE			    ProcessHandle,
 	_Out_ PHANDLE			    ThreadHandle,
 	_In_ ACCESS_MASK		    ProcessDesiredAccess,
@@ -213,7 +208,7 @@ typedef NTSTATUS(__stdcall* RtlInitUnicodeString_t)(
 	PUNICODE_STRING DestinationString,
 	PCWSTR          SourceString
 	);
-typedef NTSTATUS(__stdcall *NtAllocateVirtualMemory_t) (
+typedef NTSTATUS(__stdcall* NtAllocateVirtualMemory_t) (
 	_In_    HANDLE    ProcessHandle,
 	_Inout_ _At_(*BaseAddress, _Readable_bytes_(*RegionSize) _Writable_bytes_(*RegionSize) _Post_readable_byte_size_(*RegionSize)) PVOID* BaseAddress,
 	_In_    ULONG_PTR ZeroBits,
@@ -222,7 +217,7 @@ typedef NTSTATUS(__stdcall *NtAllocateVirtualMemory_t) (
 	_In_    ULONG     Protect
 	);
 
-typedef NTSTATUS(__stdcall *NtProtectVirtualMemory_t) (
+typedef NTSTATUS(__stdcall* NtProtectVirtualMemory_t) (
 	_In_    HANDLE  ProcessHandle,
 	_Inout_ PVOID*  BaseAddress,
 	_Inout_ PSIZE_T RegionSize,

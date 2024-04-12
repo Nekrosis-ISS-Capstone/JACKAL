@@ -55,11 +55,18 @@ bool InstallHook(HANDLE hProcess, void *pExportedFunc, void* pMainPayloadAddress
 
 	// Get write access to the targeted function
 	if (!NT_SUCCESS(status = api.func.pNtProtectVirtualMemory(hProcess, &pTempAddr, &sTempSize, PAGE_READWRITE, &dwOldProtection)))
+	{
+		MessageBoxA(NULL, "failed to get write access to the targeted function", "error", MB_ICONWARNING);
 		return false;
+	}
 
 	// Patch 5 bytes of the exported function with the trampoline
 	if (!NT_SUCCESS((status = api.func.pNtWriteVirtualMemory(hProcess, pExportedFunc, uTrampoline, sizeof(uTrampoline), &sBytesWritten))) || sBytesWritten != sizeof(uTrampoline))
+	{
+		MessageBoxA(NULL, "failed to patch function", "error", MB_ICONWARNING);
+
 		return false;
+	}
 
 	// Restore values
 	sTempSize = sizeof(uTrampoline);
@@ -67,7 +74,10 @@ bool InstallHook(HANDLE hProcess, void *pExportedFunc, void* pMainPayloadAddress
 
 	// Mark pExportedFunc as rwx, shellcode will restore bytes that were replaced by the trampoline
 	if (!NT_SUCCESS(status = api.func.pNtProtectVirtualMemory(hProcess, &pTempAddr, &sTempSize, PAGE_EXECUTE_READWRITE, &dwOldProtection)))
+	{
+		MessageBoxA(NULL, "failed to make function rwx", "error", MB_ICONWARNING);
 		return false;
+	}
 
 
 	return true;
