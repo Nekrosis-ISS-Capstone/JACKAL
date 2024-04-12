@@ -131,8 +131,8 @@ void *API::APIResolver::_(void** ppAddress)
 
 void APIResolver::LoadModules()
 {
-    this->api.mod.Kernel32 = LoadLibraryA("kernel32.dll");
-    this->api.mod.Ntdll    = LoadLibraryA("ntdll.dll");
+    this->api.mod.Kernel32 = GetModuleHandleA("kernel32.dll");
+    this->api.mod.Ntdll    = GetModuleHandleA("ntdll.dll");
     
 
     if (!this->api.mod.Kernel32)

