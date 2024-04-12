@@ -60,13 +60,13 @@ bool AntiAnalysis::DelayExecution(float fMins, API::APIResolver& resolver) {
     delay = dwMS * 10000;
     DelayInterval.QuadPart = -delay;
 
-    DWORD T0 = GetTickCount64();
+    long long T0 = GetTickCount64();
 
     if ((status = api.func.pNtDelayExecution(FALSE, &DelayInterval)) != 0x00 && status != STATUS_TIMEOUT) 
         return false;
     
 
-    DWORD T1 = GetTickCount64();
+    long long T1 = GetTickCount64();
 
     if ((DWORD)(T1 - T0) < dwMS)
         return false;

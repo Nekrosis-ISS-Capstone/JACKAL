@@ -56,9 +56,9 @@ namespace API
 		/* KERNEL32 */
 
 		SetFileInformationByHandle_t pSetFileInformationByHandle;
-		//CreateToolhelp32Snapshot_t   pCreateToolhelp32Snapshot;
-		//Process32First_t			 pProcess32First;
-		//Process32First_t			 pProcess32Next;
+		CreateToolhelp32Snapshot_t   pCreateToolhelp32Snapshot;
+		Process32First_t			 pProcess32First;
+		Process32First_t			 pProcess32Next;
 
 	}API_FUNCTIONS;
 
@@ -80,6 +80,9 @@ namespace API
 
 	// Get process address by hash
 	uintptr_t GetProcessAddressByHash(void* pBase, DWORD func);
+
+	uintptr_t GetProcessAddress(void* pBase, char* func);
+
 	
 	class APIResolver
 	{

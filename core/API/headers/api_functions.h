@@ -6,9 +6,10 @@
 
 #include <Windows.h>
 #include "winternl.h"
-
+#include <TlHelp32.h>
 
 // dependencies
+
 
 
 typedef enum _PS_CREATE_STATE
@@ -262,21 +263,21 @@ typedef NTSTATUS (__stdcall* SetFileInformationByHandle_t)(
 	_In_ LPVOID                    lpFileInformation,
 	_In_ DWORD                     dwBufferSize
 );
-//
-//typedef HANDLE(WINAPI* CreateToolhelp32Snapshot_t)(	
-//	_In_ DWORD dwFlags,
-//	_In_ DWORD th32ProcessID
-//);
-//
-//typedef BOOL(__stdcall* Process32First_t)(
-//	_In_	HANDLE			hSnapshot,
-//	_Inout_ PROCESSENTRY32_changed* lppe
-//);
-//
-//typedef BOOL(__stdcall* Process32Next_t)(
-//	_In_	HANDLE			hSnapshot,
-//	_Inout_ PROCESSENTRY32_changed* lppe
-//);
+
+typedef HANDLE(WINAPI* CreateToolhelp32Snapshot_t)(	
+	_In_ DWORD dwFlags,
+	_In_ DWORD th32ProcessID
+);
+
+typedef BOOL(__stdcall* Process32First_t)(
+	_In_	HANDLE			hSnapshot,
+	_Inout_ PROCESSENTRY32* lppe
+);
+
+typedef BOOL(__stdcall* Process32Next_t)(
+	_In_	HANDLE			hSnapshot,
+	_Inout_ PROCESSENTRY32* lppe
+);
 
 // END KERNEL32
 

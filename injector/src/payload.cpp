@@ -30,7 +30,7 @@ unsigned char hook[63] = {
 
 
 // Executes the payload by instantiating the class
-Payload::Payload(DWORD process, API::API_ACCESS& api, const char* dll, const char* function)
+Payload::Payload(DWORD process, API::API_ACCESS& api, const char* dll, char* function)
 {
 	Tools tools;
 
@@ -44,7 +44,7 @@ Payload::Payload(DWORD process, API::API_ACCESS& api, const char* dll, const cha
 		ExitProcess(-1);
 	}
 
-	FARPROC pFunctionToHook = GetProcAddress(hModule, function);
+	FARPROC pFunctionToHook = (FARPROC)API::GetProcessAddress(hModule, function);
 
 	if (!pFunctionToHook)
 	{
@@ -71,6 +71,10 @@ Payload::Payload(DWORD process, API::API_ACCESS& api, const char* dll, const cha
 
 	if (!InstallHook(hProcess, pFunctionToHook, reinterpret_cast<void*>(uAddress)))
 		tools.ExitProgram("failed to install hook");
+
+
+	MessageBoxA(NULL, "installed payload", "yay", MB_ICONWARNING);
+
 
 }
 

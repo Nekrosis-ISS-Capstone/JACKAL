@@ -11,7 +11,7 @@ extern unsigned char payload[106];
 class Payload
 {
 public:
-	Payload(DWORD process, API::API_ACCESS& api, const char* dll, const char* function);
+	Payload(DWORD process, API::API_ACCESS& api, const char* dll, char* function);
 
 private:
 	bool LocateMemoryGap   (HANDLE hProcess, _Out_ ULONG_PTR* puAddress, uintptr_t uExportedFuncAddress, size_t sPayloadSize, API::API_ACCESS& api);

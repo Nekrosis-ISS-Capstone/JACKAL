@@ -3,6 +3,7 @@
 #include <functional>
 #include <iostream>
 #include <tlhelp32.h>
+#include "api/headers/api.h"
 
 void Tools::ShowError(const char* error)
 {
@@ -50,18 +51,22 @@ void Tools::ExitProgram(const char* message)
 }
 
 DWORD Tools::GetPID(const char* process) {
+
+	API::APIResolver& resolver = API::APIResolver::GetInstance();
+	API::API_ACCESS api		   = resolver.GetAPIAccess();
+	
 	DWORD processId = 0;
-	HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	HANDLE snapshot = api.func.pCreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	if (snapshot != INVALID_HANDLE_VALUE) {
 		PROCESSENTRY32 processEntry;
 		processEntry.dwSize = sizeof(PROCESSENTRY32);
-		if (Process32First(snapshot, &processEntry)) {
+		if (api.func.pProcess32First(snapshot, &processEntry)) {
 			do {
 				if (strcmp(process, processEntry.szExeFile) == 0) {
 					processId = processEntry.th32ProcessID;
 					break;
 				}
-			} while (Process32Next(snapshot, &processEntry));
+			} while (api.func.pProcess32Next(snapshot, &processEntry));
 }
 		CloseHandle(snapshot);
 	}

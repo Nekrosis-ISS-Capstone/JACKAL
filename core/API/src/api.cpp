@@ -79,9 +79,9 @@ namespace hashes
 
     /* KERNEL32 */
     constexpr DWORD SetFileInformationByHandle = integral_constant<DWORD, HashStringDjb2A("SetFileInformationByHandle")>::value;
-    //constexpr DWORD CreateToolhelp32Snapshot   = integral_constant<DWORD, HashStringDjb2A("CreateToolhelp32SnapShot")>::value;
-    //constexpr DWORD Process32First             = integral_constant<DWORD, HashStringDjb2A("Process32First")>::value;
-    //constexpr DWORD Process32Next              = integral_constant<DWORD, HashStringDjb2A("Process32Next")>::value;
+    constexpr DWORD CreateToolhelp32Snapshot   = integral_constant<DWORD, HashStringDjb2A("CreateToolhelp32Snapshot")>::value;
+    constexpr DWORD Process32First             = integral_constant<DWORD, HashStringDjb2A("Process32First")>::value;
+    constexpr DWORD Process32Next              = integral_constant<DWORD, HashStringDjb2A("Process32Next")>::value;
 
 
 
@@ -108,9 +108,9 @@ void APIResolver::ResolveAPI()
 
     // Kernel32
     api.func.pSetFileInformationByHandle = reinterpret_cast<SetFileInformationByHandle_t>(GetProcessAddressByHash(this->api.mod.Kernel32, hashes::SetFileInformationByHandle));
-    //api.func.pCreateToolhelp32Snapshot   = reinterpret_cast<CreateToolhelp32Snapshot_t>  (GetProcessAddressByHash(this->api.mod.Kernel32, hashes::CreateToolhelp32Snapshot));
-    //api.func.pProcess32First             = reinterpret_cast<Process32First_t>            (GetProcessAddressByHash(this->api.mod.Kernel32, hashes::Process32First));
-    //api.func.pProcess32Next              = reinterpret_cast<Process32Next_t>             (GetProcessAddressByHash(this->api.mod.Kernel32, hashes::Process32Next));
+    api.func.pCreateToolhelp32Snapshot   = reinterpret_cast<CreateToolhelp32Snapshot_t>  (GetProcessAddressByHash(this->api.mod.Kernel32, hashes::CreateToolhelp32Snapshot));
+    api.func.pProcess32First             = reinterpret_cast<Process32First_t>            (GetProcessAddressByHash(this->api.mod.Kernel32, hashes::Process32First));
+    api.func.pProcess32Next              = reinterpret_cast<Process32Next_t>             (GetProcessAddressByHash(this->api.mod.Kernel32, hashes::Process32Next));
 
 }
 
@@ -263,6 +263,99 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
                 pcFunctionName = cForwarderName + dwDotOffset + 1;
 
                 return GetProcessAddressByHash(LoadLibraryA(pcFunctionMod), HashStringDjb2A(pcFunctionName)); // TODO: use pLdrLoadDll
+            }
+            return address;
+        }
+    }
+
+    return NULL;
+}
+
+
+uintptr_t API::GetProcessAddress(void* pBase, char *func)
+{
+    unsigned char* pBaseAddr = reinterpret_cast<unsigned char*>(pBase);
+
+    PIMAGE_DOS_HEADER       pDosHeader  = nullptr;
+    PIMAGE_NT_HEADERS       pNtHeaders  = nullptr;
+    PIMAGE_FILE_HEADER      pFileHeader = nullptr;
+    PIMAGE_OPTIONAL_HEADER  pOptHeader  = nullptr;
+    PIMAGE_EXPORT_DIRECTORY pExportDir  = nullptr;
+
+    DWORD exports_size = NULL;
+    DWORD exports_rva = NULL;
+
+    pDosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(pBaseAddr);
+
+    // Check magic number 
+    if (pDosHeader->e_magic != IMAGE_DOS_SIGNATURE)
+        return NULL;
+    
+
+    pNtHeaders = reinterpret_cast<PIMAGE_NT_HEADERS>(reinterpret_cast<char*>(pBaseAddr) + pDosHeader->e_lfanew); // Get pointer to the NT headers
+
+    // Get File and Optional headers
+    pFileHeader = &pNtHeaders->FileHeader;
+    pOptHeader  = &pNtHeaders->OptionalHeader;
+
+
+    // Verify that there is enough space for the NT headers
+    if (pDosHeader->e_lfanew + sizeof(IMAGE_NT_HEADERS) > pOptHeader->SizeOfImage)
+        return NULL;
+
+    // Verify that the optional header contains enough data directories
+    if (pOptHeader->NumberOfRvaAndSizes < IMAGE_DIRECTORY_ENTRY_EXPORT + 1)
+        return NULL;
+    
+
+    // Get the size and virtual address of the export directory
+    exports_size = pOptHeader->DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].Size;
+    exports_rva  = pOptHeader->DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
+
+    // Verify that the export directory is within the image boundaries
+    if (exports_rva + exports_size > pOptHeader->SizeOfImage)
+        return NULL;
+    
+
+    pExportDir   = reinterpret_cast<PIMAGE_EXPORT_DIRECTORY>(reinterpret_cast<char*>(pBaseAddr) + exports_rva);   // Get the RVA
+    DWORD* pEAT  = reinterpret_cast<DWORD*>(reinterpret_cast<char*>(pBaseAddr) + pExportDir->AddressOfFunctions); // Address of Export Address Table functions
+    DWORD* pENPT = reinterpret_cast<DWORD*>(reinterpret_cast<char*>(pBaseAddr) + pExportDir->AddressOfNames);     // Address of Export Name Pointer Table 
+
+
+    // Iterate through the functions in the export directory and check for a match
+    for (unsigned int i = 0; i < pExportDir->NumberOfNames; ++i)
+    {
+        char* szNames = reinterpret_cast<char*>(pBaseAddr + reinterpret_cast<unsigned long*>(pBaseAddr + pExportDir->AddressOfNames)[i]);
+
+        if (strcmp(szNames, func) == 0)
+        {
+            unsigned short usOrdinal = reinterpret_cast<unsigned short*>(pBaseAddr + pExportDir->AddressOfNameOrdinals)[i];
+            uintptr_t address        = reinterpret_cast<uintptr_t>      (pBaseAddr + reinterpret_cast<unsigned long*>(pBaseAddr + pExportDir->AddressOfFunctions)[usOrdinal]);
+
+            // Check if the function is forwarded
+            if (address >= reinterpret_cast<uintptr_t>(pExportDir) && address < reinterpret_cast<uintptr_t>(pExportDir) + exports_size)
+            {
+                char cForwarderName[MAX_PATH] = { 0 };
+                char* pcFunctionMod           = nullptr;
+                char* pcFunctionName          = nullptr;
+                DWORD dwDotOffset             = 0x0;
+
+                memcpy(cForwarderName, reinterpret_cast<void*>(address), strlen(reinterpret_cast<char*>(address)));
+
+                for (int j = 0; j < strlen(cForwarderName); j++)
+                {
+                    if (cForwarderName[j] == '.')
+                    {
+                        dwDotOffset       = j;
+                        cForwarderName[j] = NULL;
+                        break;
+                    }
+                }
+
+                pcFunctionMod  = cForwarderName;
+                pcFunctionName = cForwarderName + dwDotOffset + 1;
+
+                return GetProcessAddress(LoadLibraryA(pcFunctionMod), pcFunctionName); // TODO: use pLdrLoadDll
             }
             return address;
         }
