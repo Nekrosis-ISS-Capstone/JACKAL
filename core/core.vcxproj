@@ -21,12 +21,14 @@
   <ItemGroup>
     <ClInclude Include="API\headers\api.h" />
     <ClInclude Include="API\headers\api_functions.h" />
+    <ClInclude Include="utils\headers\aes.h" />
     <ClInclude Include="utils\headers\antianalysis.h" />
     <ClInclude Include="utils\headers\CRTdefs.h" />
     <ClInclude Include="utils\headers\tools.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="API\src\api.cpp" />
+    <ClCompile Include="utils\src\aes.cpp" />
     <ClCompile Include="utils\src\antianalysis.cpp" />
     <ClCompile Include="utils\src\CRTdefs.cpp" />
     <ClCompile Include="utils\src\tools.cpp" />
@@ -86,19 +88,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)\bin\core\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)\bin\core\intermediates\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(SolutionDir)\bin\intermediates\core\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)\bin\core\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)\bin\core\intermediates\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(SolutionDir)\bin\intermediates\core\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)\bin\core\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)\bin\core\intermediates\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(SolutionDir)\bin\intermediates\core\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)\bin\core\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)\bin\core\intermediates\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(SolutionDir)\bin\intermediates\core\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

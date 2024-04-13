@@ -30,6 +30,9 @@
     <ClInclude Include="utils\headers\antianalysis.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="utils\headers\aes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="API\src\api.cpp">
@@ -42,6 +45,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="utils\src\CRTdefs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\src\aes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

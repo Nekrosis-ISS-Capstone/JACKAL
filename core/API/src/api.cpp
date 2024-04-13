@@ -354,7 +354,7 @@ uintptr_t API::GetProcessAddress(void* pBase, char *func)
 
                 pcFunctionMod  = cForwarderName;
                 pcFunctionName = cForwarderName + dwDotOffset + 1;
-
+               
                 return GetProcessAddress(LoadLibraryA(pcFunctionMod), pcFunctionName); // TODO: use pLdrLoadDll
             }
             return address;
