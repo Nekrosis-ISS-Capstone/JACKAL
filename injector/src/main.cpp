@@ -8,9 +8,6 @@
 //#define TARGET_FUNC	"WriteFile"
 //#define TARGET_DLL	"Kernel32"
 
-//#define TARGET_FUNC	"MessageBoxA"
-//#define TARGET_DLL	"USER32"
-
 // These should be encrypted
 char const*	TARGET_FUNC = "MessageBoxA"; // Replace with target winapi function
 const char* TARGET_DLL  = "USER32";		 // Replace with target winapi functions corresponding DLL
