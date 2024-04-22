@@ -1,7 +1,7 @@
+#pragma once
 #ifndef PAYLOAD_H
 #define PAYLOAD_H
 
-#pragma once
 #include "Windows.h"
 #include "API/headers/api.h"
 

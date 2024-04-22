@@ -1,7 +1,7 @@
+#pragma once
 #ifndef ANTIANALYSIS_H
 #define ANTIANALYSIS_H
 
-#pragma once
 #include "API/headers/api.h"
 
 

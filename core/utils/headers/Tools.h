@@ -1,7 +1,7 @@
+#pragma once
 #ifndef TOOLS_H
 #define TOOLS_H
 
-#pragma once
 #include <Windows.h>
 #include <string>
 

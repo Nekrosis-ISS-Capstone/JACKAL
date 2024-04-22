@@ -1,11 +1,10 @@
+#pragma once
 #ifndef API_H
 #define API_H
 
-#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 
-#include <Windows.h>
 #include <API/headers/api_functions.h>
 
 namespace API
@@ -21,7 +20,7 @@ namespace API
 	{
 		// We will have a function to get handles to these modules via their hashed value 
 		/*HMODULE Kernel32, Ntdll, User32, Wininet, Shell32, Advapi32, Urlmon, Ws2_32, Shlwapi;*/
-		HMODULE Kernel32, Ntdll;
+		HMODULE Kernel32, Ntdll, BCrypt;
 
 
 	}API_MODULES;
@@ -45,13 +44,7 @@ namespace API
 		NtDelayExecution_t			 pNtDelayExecution;
 		LdrGetProcedureAddress_t     pLdrGetProcedureAddress;
 		
-
-
-		
-
 		RtlInitUnicodeString_t		 RtlInitUnicodeString;
-
-
 
 		/* KERNEL32 */
 
@@ -59,6 +52,17 @@ namespace API
 		CreateToolhelp32Snapshot_t   pCreateToolhelp32Snapshot;
 		Process32First_t			 pProcess32First;
 		Process32First_t			 pProcess32Next;
+
+
+		/* BCRYPT */
+		BCryptOpenAlgorithmProvider_t  pBCryptOpenAlgorithmProvider;
+		BCryptCloseAlgorithmProvider_t pBCryptCloseAlgorithmProvider;
+		BCryptGetProperty_t			   pBCryptGetProperty;
+		BCryptSetProperty_t			   pBCryptSetProperty;
+		BCryptGenerateSymmetricKey_t   pBCryptGenerateSymmetricKey;
+		BCryptEncrypt_t				   pBCryptEncrypt;
+		BCryptDecrypt_t				   pBCryptDecrypt;
+		BCryptDestroyKey_t			   pBCryptDestroyKey;			
 
 	}API_FUNCTIONS;
 
@@ -69,7 +73,7 @@ namespace API
 		API_FUNCTIONS func;
 
 	}API_ACCESS;
-
+	
 	// ---- Hashing Functions ----
 	consteval int RandomCompileTimeSeed(void);
 

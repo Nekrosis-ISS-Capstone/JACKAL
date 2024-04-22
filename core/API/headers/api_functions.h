@@ -1,6 +1,4 @@
 #pragma once
-
-#pragma once
 #ifndef API_FUNCTIONS_H
 #define API_FUNCTIONS_H
 
@@ -280,5 +278,80 @@ typedef BOOL(__stdcall* Process32Next_t)(
 );
 
 // END KERNEL32
+
+
+// BCRYPT
+
+typedef NTSTATUS(__stdcall* BCryptSetProperty_t)(
+	_Inout_   PVOID			hObject,
+	_In_      LPCWSTR       pszProperty,
+	_In_      PUCHAR        pbInput,
+	_In_      ULONG         cbInput,
+	_In_      ULONG         dwFlags
+);
+
+typedef NTSTATUS (__stdcall* BCryptGetProperty_t)(
+	_In_  PVOID			hObject,
+	_In_  LPCWSTR       pszProperty,
+	_In_ PUCHAR         pbOutput,
+	_In_  ULONG         cbOutput,
+	_In_ ULONG*			pcbResult,
+	_In_  ULONG         dwFlags
+);
+
+typedef NTSTATUS (__stdcall *BCryptOpenAlgorithmProvider_t)(
+	_Out_ PVOID*	phAlgorithm,
+	_In_  LPCWSTR   pszAlgId,
+	_In_  LPCWSTR   pszImplementation,
+	_In_  ULONG     dwFlags
+);
+
+typedef NTSTATUS(__stdcall* BCryptGenerateSymmetricKey_t)(
+	_Inout_  PVOID		hAlgorithm,
+	_Out_    PVOID*		phKey,
+	_Out_opt_ PUCHAR    pbKeyObject,
+	_In_     ULONG      cbKeyObject,
+	_In_     PUCHAR     pbSecret,
+	_In_     ULONG      cbSecret,
+	_In_     ULONG      dwFlags
+);
+
+typedef NTSTATUS(__stdcall* BCryptEncrypt_t)(
+	_Inout_            PVOID			 hKey,
+	_In_               PUCHAR            pbInput,
+	_In_               ULONG             cbInput,
+	_In_opt_           void*			 pPaddingInfo,
+	_Inout_opt_        PUCHAR            pbIV,
+	_In_               ULONG             cbIV,
+	_Out_opt_          PUCHAR            pbOutput,
+	_In_               ULONG             cbOutput,
+	_Out_              ULONG*			 pcbResult,
+	_In_               ULONG             dwFlags
+);
+
+typedef NTSTATUS(__stdcall* BCryptDecrypt_t)(
+	_Inout_            PVOID		     hKey,
+	_In_               PUCHAR            pbInput,
+	_In_               ULONG             cbInput,
+	_In_opt_           VOID*			 pPaddingInfo,
+	_Inout_opt_        PUCHAR            pbIV,
+	_In_               ULONG             cbIV,
+	_Out_opt_          PUCHAR            pbOutput,
+	_In_               ULONG             cbOutput,
+	_Out_              ULONG*			 pcbResult,
+	_In_               ULONG             dwFlags
+	);
+
+
+typedef NTSTATUS(__stdcall* BCryptDestroyKey_t)(
+	_Inout_ PVOID hKey
+);
+
+typedef NTSTATUS(__stdcall* BCryptCloseAlgorithmProvider_t)(
+	_Inout_ PVOID			  hAlgorithm,
+	_In_    ULONG             dwFlags
+);
+
+// END BCRYPT
 
 #endif NTDLL_FUNCTIONS_H

