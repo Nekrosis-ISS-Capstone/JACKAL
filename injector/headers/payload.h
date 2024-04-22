@@ -6,7 +6,7 @@
 #include "API/headers/api.h"
 
 extern unsigned char hook[63];
-extern unsigned char payload[106];
+extern unsigned char payload[];
 
 class Payload
 {

