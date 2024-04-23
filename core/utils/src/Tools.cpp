@@ -38,11 +38,17 @@ void Tools::ShowError(const char* error)
 //}
 //
 //
-//void Logging::PrintConsole(std::string message)
-//{
-//    std::cout << message << "\n";
-//}
-//
+void Tools::PrintConsole(const char *message)
+{
+	DWORD  dwCharsWritten; // WriteConsole dependency 
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+	if (hConsole != INVALID_HANDLE_VALUE) 
+	{
+		WriteConsoleA(hConsole, message, strlen(message), &dwCharsWritten, NULL);
+	}
+}
+
 
 void Tools::ExitProgram(const char* message)
 {
@@ -73,17 +79,17 @@ DWORD Tools::GetPID(const char* process) {
 	return processId;
 }
 
-//void Tools::EnableDebugConsole() {
+void Tools::EnableDebugConsole() {
 //#ifdef _DEBUG
-//    if (AllocConsole()) {
-//        HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-//        HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
-//
-//        if (hOut != INVALID_HANDLE_VALUE && hIn != INVALID_HANDLE_VALUE) {
-//            SetConsoleTitle("Debug Console");
-//            SetStdHandle(STD_OUTPUT_HANDLE, hOut);
-//            SetStdHandle(STD_INPUT_HANDLE, hIn);
-//        }
-//    }
+    if (AllocConsole()) {
+        HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+        HANDLE hIn  = GetStdHandle(STD_INPUT_HANDLE);
+
+        if (hOut != INVALID_HANDLE_VALUE && hIn != INVALID_HANDLE_VALUE) {
+            SetConsoleTitle("Debug Console");
+            SetStdHandle(STD_OUTPUT_HANDLE, hOut);
+            SetStdHandle(STD_INPUT_HANDLE, hIn);
+        }
+    }
 //#endif
-//}
+}

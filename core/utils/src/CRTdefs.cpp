@@ -19,7 +19,8 @@ int atexit(void (*function)(void)) {
 }
 
 // Function to call all registered functions on program exit
-void call_atexit_funcs() {
+void call_atexit_funcs() 
+{
 	// Call each registered function in reverse order
 	for (size_t i = sAtExitFuncs; i > 0; --i) {
 		AtExitFuncs[i - 1].func();
@@ -46,8 +47,8 @@ int __cdecl strcmp(_In_ LPCSTR String1, _In_ LPCSTR String2)
 	return ((*(LPCSTR)String1 < *(LPCSTR)String2) ? -1 : +1);
 }
 
-void* __cdecl memset(void* dest, int val, size_t sz) {
-	// logic similar to memset's one
+void* __cdecl memset(void* dest, int val, size_t sz) 
+{
 	unsigned char* p = (unsigned char*)dest;
 	while (sz > 0) {
 		*p = (unsigned char)val;

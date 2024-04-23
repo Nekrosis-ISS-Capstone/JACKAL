@@ -262,7 +262,7 @@ typedef NTSTATUS (__stdcall* SetFileInformationByHandle_t)(
 	_In_ DWORD                     dwBufferSize
 );
 
-typedef HANDLE(WINAPI* CreateToolhelp32Snapshot_t)(	
+typedef HANDLE(__stdcall* CreateToolhelp32Snapshot_t)(	
 	_In_ DWORD dwFlags,
 	_In_ DWORD th32ProcessID
 );
@@ -353,5 +353,14 @@ typedef NTSTATUS(__stdcall* BCryptCloseAlgorithmProvider_t)(
 );
 
 // END BCRYPT
+
+// ADVAPI32
+
+typedef bool(__stdcall* RtlGenRandom_t)(
+	_Out_ PVOID RandomBuffer,
+	_Out_ ULONG RandomBufferLength
+);
+
+// END ADVAPI32
 
 #endif NTDLL_FUNCTIONS_H

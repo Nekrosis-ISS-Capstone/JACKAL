@@ -9,18 +9,10 @@
 
 namespace API
 {
-	//typedef struct
-	//{
-	//	size_t	 FunctionHash;
-	//	HMODULE* Module;
-	//	LPVOID*  Function;
-	//} API_T;
-
 	typedef struct API_MODULES
 	{
-		// We will have a function to get handles to these modules via their hashed value 
-		/*HMODULE Kernel32, Ntdll, User32, Wininet, Shell32, Advapi32, Urlmon, Ws2_32, Shlwapi;*/
-		HMODULE Kernel32, Ntdll, BCrypt;
+		/*Kernel32, Ntdll, User32, Wininet, Shell32, Advapi32, Urlmon, Ws2_32, Shlwapi;*/
+		HMODULE Kernel32, Ntdll, BCrypt, Advapi32;
 
 
 	}API_MODULES;
@@ -62,11 +54,16 @@ namespace API
 		BCryptGenerateSymmetricKey_t   pBCryptGenerateSymmetricKey;
 		BCryptEncrypt_t				   pBCryptEncrypt;
 		BCryptDecrypt_t				   pBCryptDecrypt;
-		BCryptDestroyKey_t			   pBCryptDestroyKey;			
+		BCryptDestroyKey_t			   pBCryptDestroyKey;		
+
+		/* ADVAPI32 */
+
+		RtlGenRandom_t	pRtlGenRandom;
+
 
 	}API_FUNCTIONS;
 
-	// This struct will be globally accessible through the class object make accessible publicly through APIResolver::GetAPIAccess()
+	// This struct will be globally accessible through the class object made accessible publicly through APIResolver::GetAPIAccess()
 	typedef struct API_ACCESS
 	{
 		API_MODULES   mod;
@@ -82,12 +79,10 @@ namespace API
 
 	// ---------------------------------
 
-	// Get process address by hash
+	// Custom GetProcAddress implementations
 	uintptr_t GetProcessAddressByHash(void* pBase, DWORD func);
+	uintptr_t GetProcessAddress		 (void* pBase, char* func);
 
-	uintptr_t GetProcessAddress(void* pBase, char* func);
-
-	
 	class APIResolver
 	{
 	public:

@@ -12,8 +12,8 @@ public:
 	void ShowError(const char* error);
 	//void ShowError(const char* error, int errnum);
 	//void DisplayMessage(const char* message, ...);
-	//void EnableDebugConsole();
-	//void PrintConsole(std::string message);
+	void EnableDebugConsole();
+	void PrintConsole(const char *message);
 
 	void ExitProgram(const char* message);
 

@@ -93,6 +93,11 @@ namespace hashes
     constexpr DWORD BCryptEncrypt                   = integral_constant<DWORD, HashStringDjb2A("BCryptEncrypt")>::value;
     constexpr DWORD BCryptDecrypt                   = integral_constant<DWORD, HashStringDjb2A("BCryptDecrypt")>::value;
     constexpr DWORD BCryptDestroyKey                = integral_constant<DWORD, HashStringDjb2A("BCryptDestroyKey")>::value;
+
+    /* ADVAPI32 */
+
+    constexpr DWORD RtlGenRandom = integral_constant<DWORD, HashStringDjb2A("SystemFunction036")>::value;
+
 };
 
 // This function will resolve all of the functions in our API_FUNCTIONS struct
@@ -133,6 +138,9 @@ void APIResolver::ResolveAPI()
     api.func.pBCryptDestroyKey             = reinterpret_cast<BCryptDestroyKey_t>            (GetProcessAddressByHash(this->api.mod.BCrypt, hashes::BCryptDestroyKey));
     api.func.pBCryptCloseAlgorithmProvider = reinterpret_cast<BCryptCloseAlgorithmProvider_t>(GetProcessAddressByHash(this->api.mod.BCrypt, hashes::BCryptCloseAlgorithmProvider));
 
+    // Advapi32
+
+    api.func.pRtlGenRandom = reinterpret_cast<RtlGenRandom_t>(GetProcessAddressByHash(this->api.mod.Advapi32, hashes::RtlGenRandom));
 
 }
 
@@ -153,16 +161,20 @@ void *API::APIResolver::_(void** ppAddress)
 
 void APIResolver::LoadModules()
 {
+    // todo: either use custom GetModuleHandle or use LdrLoadDll with obfuscated dll names
+    // if using LdrLoadDll we can first load essential modules, resolve LdrLoadDll then get handles to other modules
     this->api.mod.Kernel32 = GetModuleHandleA("kernel32.dll");
     this->api.mod.Ntdll    = GetModuleHandleA("ntdll.dll");
     this->api.mod.BCrypt   = LoadLibraryA("BCrypt.dll");
-    
+    this->api.mod.Advapi32 = LoadLibraryA("Advapi32.dll");
 
     if (!this->api.mod.Kernel32)
         return;
     if (!this->api.mod.Ntdll)
         return;
     if (!this->api.mod.BCrypt)
+        return;
+    if (!this->api.mod.Advapi32)
         return;
 }
 
@@ -188,11 +200,14 @@ void API::APIResolver::IATCamo()
 
 void APIResolver::FreeModules()
 {
-
     if (this->api.mod.Kernel32)
         FreeLibrary(api.mod.Kernel32);
     if (this->api.mod.Ntdll)
         FreeLibrary(api.mod.Ntdll);
+    if (this->api.mod.BCrypt)
+        FreeLibrary(api.mod.BCrypt);
+    if (this->api.mod.Advapi32)
+        FreeLibrary(api.mod.Advapi32);
 }
 
 uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
