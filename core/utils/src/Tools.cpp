@@ -73,17 +73,17 @@ DWORD Tools::GetPID(const char* process) {
 	return processId;
 }
 
-void Tools::EnableDebugConsole() {
-#ifdef _DEBUG
-    if (AllocConsole()) {
-        HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-        HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
-
-        if (hOut != INVALID_HANDLE_VALUE && hIn != INVALID_HANDLE_VALUE) {
-            SetConsoleTitle("Debug Console");
-            SetStdHandle(STD_OUTPUT_HANDLE, hOut);
-            SetStdHandle(STD_INPUT_HANDLE, hIn);
-        }
-    }
-#endif
-}
+//void Tools::EnableDebugConsole() {
+//#ifdef _DEBUG
+//    if (AllocConsole()) {
+//        HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+//        HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
+//
+//        if (hOut != INVALID_HANDLE_VALUE && hIn != INVALID_HANDLE_VALUE) {
+//            SetConsoleTitle("Debug Console");
+//            SetStdHandle(STD_OUTPUT_HANDLE, hOut);
+//            SetStdHandle(STD_INPUT_HANDLE, hIn);
+//        }
+//    }
+//#endif
+//}
