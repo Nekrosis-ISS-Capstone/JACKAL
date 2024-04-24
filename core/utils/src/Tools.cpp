@@ -3,7 +3,6 @@
 #include <functional>
 #include <iostream>
 #include <tlhelp32.h>
-#include "api/headers/api.h"
 
 void Tools::ShowError(const char* error)
 {
@@ -78,6 +77,28 @@ DWORD Tools::GetPID(const char* process) {
 		CloseHandle(snapshot);
 	}
 	return processId;
+}
+
+DWORD Tools::CreateRandomNumber(DWORD Seed, API::API_ACCESS& api)
+{
+	ULONG Random = 0;
+	Random = Seed;
+	return api.func.pRtlRandomEx(&Random);
+}
+
+DWORD Tools::GetRandomNumber(API::API_ACCESS& api)
+{
+	ULONG Random;
+	POINT Point;
+
+	ZeroMemory(&Point, sizeof(POINT));
+
+	if (!GetCursorPos(&Point))
+		return 0;
+
+	Random = (Point.x * Point.y) * api.func.pGetTickCount64();
+
+	return CreateRandomNumber(Random, api);
 }
 
 void Tools::EnableDebugConsole() {

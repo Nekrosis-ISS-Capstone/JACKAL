@@ -282,6 +282,9 @@ typedef BOOL(__stdcall* Process32Next_t)(
 	_Inout_ PROCESSENTRY32* lppe
 );
 
+typedef ULONGLONG(__stdcall *GetTickCount64_t)();
+
+
 // END KERNEL32
 
 
@@ -367,5 +370,13 @@ typedef bool(__stdcall* RtlGenRandom_t)(
 );
 
 // END ADVAPI32
+
+// USER32
+
+typedef bool(__stdcall* GetCursorPos_t)(
+	_Out_ LPPOINT lpPoint
+);
+
+// END USER32
 
 #endif NTDLL_FUNCTIONS_H

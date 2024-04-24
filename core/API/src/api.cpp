@@ -83,6 +83,8 @@ namespace hashes
     constexpr DWORD CreateToolhelp32Snapshot   = integral_constant<DWORD, HashStringDjb2A("CreateToolhelp32Snapshot")>::value;
     constexpr DWORD Process32First             = integral_constant<DWORD, HashStringDjb2A("Process32First")>::value;
     constexpr DWORD Process32Next              = integral_constant<DWORD, HashStringDjb2A("Process32Next")>::value;
+    constexpr DWORD GetTickCount64             = integral_constant<DWORD, HashStringDjb2A("GetTickCount64")>::value;
+
 
     /* BCRYPT */
 
@@ -99,7 +101,40 @@ namespace hashes
 
     constexpr DWORD RtlGenRandom = integral_constant<DWORD, HashStringDjb2A("SystemFunction036")>::value;
 
+    /* USER32 */
+    constexpr DWORD GetCursorPos = integral_constant<DWORD, HashStringDjb2A("GetCursorPos")>::value;
+
 };
+
+
+
+
+/*
+
+
+// Define a struct that represents a function
+struct Function {
+    char name[50]; // Function name
+    void** ptr;    // Function pointer
+};
+
+// Define an array of functions
+Function functions[] = {
+    {"NtQueryInformationProcess", reinterpret_cast<void**>(&api.func.pNtQueryInformationProcess)},
+    {"NtCreateProcess",           reinterpret_cast<void**>(&api.func.pNtCreateProcess)},
+    {"NtCreateUserProcess",       reinterpret_cast<void**>(&api.func.pNtCreateUserProcess)},
+    // Add more functions here...
+};
+
+// Iterate over the array and initialize each function pointer
+for (int i = 0; i < sizeof(functions) / sizeof(Function); i++) {
+    *functions[i].ptr = GetProcessAddressByHash(this->api.mod.Ntdll, hashes::functions[i].name);
+}
+
+
+*/
+
+
 
 // This function will resolve all of the functions in our API_FUNCTIONS struct
 // TODO: split this function up into resolving individual modules, find a way to use a loop instead of having everything hard coded (messy)
@@ -127,6 +162,7 @@ void APIResolver::ResolveAPI()
     api.func.pCreateToolhelp32Snapshot   = reinterpret_cast<CreateToolhelp32Snapshot_t>  (GetProcessAddressByHash(this->api.mod.Kernel32, hashes::CreateToolhelp32Snapshot));
     api.func.pProcess32First             = reinterpret_cast<Process32First_t>            (GetProcessAddressByHash(this->api.mod.Kernel32, hashes::Process32First));
     api.func.pProcess32Next              = reinterpret_cast<Process32Next_t>             (GetProcessAddressByHash(this->api.mod.Kernel32, hashes::Process32Next));
+    api.func.pGetTickCount64             = reinterpret_cast<GetTickCount64_t>            (GetProcessAddressByHash(this->api.mod.Kernel32, hashes::GetTickCount64));
 
 
     // BCrypt
@@ -152,6 +188,13 @@ void APIResolver::ResolveAPI()
    // api.func.pRtlGenRandom = reinterpret_cast<RtlGenRandom_t>(GetProcAddress(this->api.mod.Advapi32, "SystemFunction036"));
 
 
+    // User32
+    api.func.pGetCursorPos = reinterpret_cast<GetCursorPos_t>(GetProcessAddressByHash(this->api.mod.User32, hashes::GetCursorPos));
+
+
+
+
+
 }
 
 void *API::APIResolver::_(void** ppAddress)
@@ -171,12 +214,13 @@ void *API::APIResolver::_(void** ppAddress)
 
 void APIResolver::LoadModules()
 {
-    // TODO: either use custom GetModuleHandle or use LdrLoadDll with obfuscated dll names
+    // TODO: either use custom GetModuleHandle, LoadLibraryByHash or use LdrLoadDll with obfuscated dll names
     // if using LdrLoadDll we can first load essential modules, resolve LdrLoadDll then get handles to other modules
     this->api.mod.Kernel32 = GetModuleHandleA("kernel32.dll");
     this->api.mod.Ntdll    = GetModuleHandleA("ntdll.dll");
     this->api.mod.BCrypt   = LoadLibraryA("BCrypt.dll");
     this->api.mod.Advapi32 = LoadLibraryA("Advapi32.dll");
+    this->api.mod.User32   = LoadLibraryA("User32.dll");
 
     if (!this->api.mod.Kernel32)
         return;
@@ -185,6 +229,8 @@ void APIResolver::LoadModules()
     if (!this->api.mod.BCrypt)
         return;
     if (!this->api.mod.Advapi32)
+        return;
+    if (!this->api.mod.User32)
         return;
 }
 
@@ -219,6 +265,8 @@ void APIResolver::FreeModules()
         FreeLibrary(api.mod.BCrypt);
     if (this->api.mod.Advapi32)
         FreeLibrary(api.mod.Advapi32);
+    if (this->api.mod.User32)
+        FreeLibrary(api.mod.User32);
 }
 
 uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)

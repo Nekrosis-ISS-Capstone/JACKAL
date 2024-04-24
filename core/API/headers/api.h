@@ -12,7 +12,7 @@ namespace API
 	typedef struct API_MODULES
 	{
 		/*Kernel32, Ntdll, User32, Wininet, Shell32, Advapi32, Urlmon, Ws2_32, Shlwapi;*/
-		HMODULE Kernel32, Ntdll, BCrypt, Advapi32;
+		HMODULE Kernel32, Ntdll, BCrypt, Advapi32, User32;
 
 
 	}API_MODULES;
@@ -46,6 +46,7 @@ namespace API
 		CreateToolhelp32Snapshot_t   pCreateToolhelp32Snapshot;
 		Process32First_t			 pProcess32First;
 		Process32First_t			 pProcess32Next;
+		GetTickCount64_t			 pGetTickCount64;
 
 
 		/* BCRYPT */
@@ -61,6 +62,9 @@ namespace API
 		/* ADVAPI32 */
 
 		RtlGenRandom_t	pRtlGenRandom;
+
+		/* USER32 */
+		GetCursorPos_t pGetCursorPos;
 
 
 	}API_FUNCTIONS;
@@ -93,7 +97,7 @@ namespace API
 
 		void FreeModules();
 		const  API_ACCESS&  GetAPIAccess() const;
-		static APIResolver& GetInstance() const {return instance;}
+		static APIResolver& GetInstance() {return instance;}
 
 		void LoadModules();
 		void ResolveAPI();
