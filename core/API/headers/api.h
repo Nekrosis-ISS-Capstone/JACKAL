@@ -93,7 +93,7 @@ namespace API
 
 		void FreeModules();
 		const  API_ACCESS&  GetAPIAccess() const;
-		static APIResolver& GetInstance() {return instance;}
+		static APIResolver& GetInstance() const {return instance;}
 
 		void LoadModules();
 		void ResolveAPI();

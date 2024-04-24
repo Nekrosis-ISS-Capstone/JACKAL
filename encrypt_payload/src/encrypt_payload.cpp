@@ -85,14 +85,23 @@ int main()
 
 	unsigned char key[KEYSIZE];
 	unsigned char iv [IVSIZE];
+
+	//ZeroMemory(key, KEYSIZE);
+	//ZeroMemory(iv , IVSIZE);
+
+
 	
-	if (api.func.pRtlGenRandom)
+	if (api.func.pRtlRandomEx)
 	{
 		tools.PrintConsole( "function found in module");
 
+		for (auto x : key)
+		{
+
+		}
 
 		// Create random number
-		if (!NT_SUCCESS(status = api.func.pRtlGenRandom(key, KEYSIZE)))
+		if (!NT_SUCCESS(status = api.func.pRtlRandomEx(key, KEYSIZE)))
 			tools.PrintConsole("rtlgenrandom failed");
 	}
 	tools.PrintConsole("\n");
@@ -100,7 +109,7 @@ int main()
 	Sleep(10);
 
 	SecureZeroMemory(key, KEYSIZE);
-	MessageBoxA(NULL, "here", "", NULL);
+	MessageBoxA(NULL, "end", "", NULL);
 	return 0;
 }
 
