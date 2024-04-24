@@ -35,6 +35,8 @@ namespace API
 		NtFlushInstructionCache_t	 pNtFlushInstructionCache;
 		NtDelayExecution_t			 pNtDelayExecution;
 		LdrGetProcedureAddress_t     pLdrGetProcedureAddress;
+		RtlRandomEx_t				 pRtlRandomEx;
+
 		
 		RtlInitUnicodeString_t		 RtlInitUnicodeString;
 

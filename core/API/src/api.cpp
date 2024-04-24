@@ -75,6 +75,7 @@ namespace hashes
     constexpr DWORD NtFlushInstructionCache     = integral_constant<DWORD, HashStringDjb2A("NtFlushInstructionCache")>::value;
     constexpr DWORD NtDelayExecution            = integral_constant<DWORD, HashStringDjb2A("NtDelayExecution")>::value;
     constexpr DWORD LdrGetProcedureAddress      = integral_constant<DWORD, HashStringDjb2A("LdrGetProcedureAddress")>::value;
+    constexpr DWORD RtlRandomEx                 = integral_constant<DWORD, HashStringDjb2A("RtlRandomEx")>::value;
 
 
     /* KERNEL32 */
@@ -101,11 +102,12 @@ namespace hashes
 };
 
 // This function will resolve all of the functions in our API_FUNCTIONS struct
+// TODO: split this function up into resolving individual modules, find a way to use a loop instead of having everything hard coded (messy)
 void APIResolver::ResolveAPI()
 {
     // NTDLL
     api.func.pNtQueryInformationProcess  = reinterpret_cast<NtQueryInformationProcess_t> (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtQueryInformationProcess));
-    api.func.pNtCreateProcess            = reinterpret_cast<NtCreateProcess_t>           (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateProcess)); // Use NtCreateUserProcess instead
+    api.func.pNtCreateProcess            = reinterpret_cast<NtCreateProcess_t>           (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateProcess)); // TODO: Use NtCreateUserProcess instead
     api.func.pNtCreateUserProcess        = reinterpret_cast<NtCreateUserProcess_t>       (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateUserProcess));
     api.func.pNtCreateThread             = reinterpret_cast<NtCreateThread_t>            (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtCreateThread));
     api.func.pLdrLoadDll                 = reinterpret_cast<LdrLoadDll_t>                (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::LdrLoadDll));
@@ -118,6 +120,7 @@ void APIResolver::ResolveAPI()
     api.func.pNtFlushInstructionCache    = reinterpret_cast<NtFlushInstructionCache_t>   (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtFlushInstructionCache));
     api.func.pNtDelayExecution           = reinterpret_cast<NtDelayExecution_t>          (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::NtDelayExecution));
     api.func.pLdrGetProcedureAddress     = reinterpret_cast<LdrGetProcedureAddress_t>    (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::LdrGetProcedureAddress));
+    api.func.pRtlRandomEx                = reinterpret_cast<RtlRandomEx_t>               (GetProcessAddressByHash(this->api.mod.Ntdll, hashes::RtlRandomEx));
 
     // Kernel32
     api.func.pSetFileInformationByHandle = reinterpret_cast<SetFileInformationByHandle_t>(GetProcessAddressByHash(this->api.mod.Kernel32, hashes::SetFileInformationByHandle));
@@ -146,7 +149,7 @@ void APIResolver::ResolveAPI()
     //api.func.pRtlGenRandom = reinterpret_cast<RtlGenRandom_t>(GetProcessAddress(this->api.mod.Advapi32, "SystemFunction036"));
 
     //TODO: figure out why GetProcessAddressByHash isn't working for this function - might have to use LdrGetProcedureAddress
-    api.func.pRtlGenRandom = reinterpret_cast<RtlGenRandom_t>(GetProcAddress(this->api.mod.Advapi32, "SystemFunction036"));
+   // api.func.pRtlGenRandom = reinterpret_cast<RtlGenRandom_t>(GetProcAddress(this->api.mod.Advapi32, "SystemFunction036"));
 
 }
 
@@ -167,7 +170,7 @@ void *API::APIResolver::_(void** ppAddress)
 
 void APIResolver::LoadModules()
 {
-    // todo: either use custom GetModuleHandle or use LdrLoadDll with obfuscated dll names
+    // TODO: either use custom GetModuleHandle or use LdrLoadDll with obfuscated dll names
     // if using LdrLoadDll we can first load essential modules, resolve LdrLoadDll then get handles to other modules
     this->api.mod.Kernel32 = GetModuleHandleA("kernel32.dll");
     this->api.mod.Ntdll    = GetModuleHandleA("ntdll.dll");
@@ -184,6 +187,7 @@ void APIResolver::LoadModules()
         return;
 }
 
+// TODO: move this to antianalysis
 void API::APIResolver::IATCamo()
 {
     void		*pAddress = NULL;
@@ -218,8 +222,6 @@ void APIResolver::FreeModules()
 
 uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
 {
-    unsigned char* pBaseAddr = reinterpret_cast<unsigned char*>(pBase);
-
     PIMAGE_DOS_HEADER       pDosHeader  = nullptr;
     PIMAGE_NT_HEADERS       pNtHeaders  = nullptr;
     PIMAGE_FILE_HEADER      pFileHeader = nullptr;
@@ -229,6 +231,8 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
     DWORD exports_size = NULL;
     DWORD exports_rva  = NULL;
 
+    unsigned char* pBaseAddr = reinterpret_cast<unsigned char*>(pBase);
+    
     pDosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(pBaseAddr);
 
     // Check magic number 
@@ -308,7 +312,7 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
                 pcFunctionMod  = cForwarderName;
                 pcFunctionName = cForwarderName + dwDotOffset + 1;
 
-                return GetProcessAddressByHash(LoadLibraryA(pcFunctionMod), HashStringDjb2A(pcFunctionName)); // TODO: use pLdrLoadDll
+                return GetProcessAddressByHash(LoadLibraryA(pcFunctionMod), HashStringDjb2A(pcFunctionName)); // TODO: use pLdrLoadDll, or use a custom loadlibrary function
             }
             return address;
         }
@@ -320,8 +324,6 @@ uintptr_t API::GetProcessAddressByHash(void* pBase, DWORD func)
 
 uintptr_t API::GetProcessAddress(void* pBase, char *func)
 {
-    unsigned char* pBaseAddr = reinterpret_cast<unsigned char*>(pBase);
-
     PIMAGE_DOS_HEADER       pDosHeader  = nullptr;
     PIMAGE_NT_HEADERS       pNtHeaders  = nullptr;
     PIMAGE_FILE_HEADER      pFileHeader = nullptr;
@@ -331,6 +333,8 @@ uintptr_t API::GetProcessAddress(void* pBase, char *func)
     DWORD exports_size = NULL;
     DWORD exports_rva = NULL;
 
+    unsigned char* pBaseAddr = reinterpret_cast<unsigned char*>(pBase);
+ 
     pDosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(pBaseAddr);
 
     // Check magic number 

@@ -250,6 +250,11 @@ typedef NTSTATUS(__stdcall* NtDelayExecution_t)(
 	PLARGE_INTEGER       DelayInterval
 	);
 
+typedef ULONG(__stdcall* RtlRandomEx_t)(
+	_Inout_ PULONG Seed
+	);
+
+
 // END NTDLL
 
 

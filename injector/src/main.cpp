@@ -32,10 +32,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	Tools		 tools;
 	DWORD		 process = 0; 
 
-
-	wchar_t szPassword[260];
-	SecureZeroMemory(szPassword, sizeof(szPassword));
-
 	API::APIResolver &resolver = API::APIResolver::GetInstance(); // Get instance of the API resolver
 
 	hide.IsBeingWatched(resolver); // Initial antianalysis check
