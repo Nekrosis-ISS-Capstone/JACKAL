@@ -50,6 +50,7 @@ void Tools::PrintConsole(const char *message)
 }
 
 
+
 void Tools::ExitProgram(const char* message)
 {
     MessageBoxA(NULL, message, "error", MB_ICONWARNING);

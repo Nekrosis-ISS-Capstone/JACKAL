@@ -16,7 +16,7 @@ int atexit(void (*function)(void)) {
 	else {
 		return 1; // Failure, array is full
 	}
-}
+} 
 
 // Function to call all registered functions on program exit
 void call_atexit_funcs() 
