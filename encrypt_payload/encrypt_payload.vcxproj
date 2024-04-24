@@ -103,7 +103,7 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -129,7 +129,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
@@ -152,7 +152,7 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -178,7 +178,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>

@@ -81,15 +81,35 @@ DWORD Tools::GetPID(const char* process) {
 
 void Tools::EnableDebugConsole() {
 //#ifdef _DEBUG
-    if (AllocConsole()) {
-        HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-        HANDLE hIn  = GetStdHandle(STD_INPUT_HANDLE);
+    //if (AllocConsole()) {
+    //    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    //    HANDLE hIn  = GetStdHandle(STD_INPUT_HANDLE);
 
-        if (hOut != INVALID_HANDLE_VALUE && hIn != INVALID_HANDLE_VALUE) {
-            SetConsoleTitle("Debug Console");
-            SetStdHandle(STD_OUTPUT_HANDLE, hOut);
-            SetStdHandle(STD_INPUT_HANDLE, hIn);
-        }
-    }
+    //    if (hOut != INVALID_HANDLE_VALUE && hIn != INVALID_HANDLE_VALUE) {
+    //        SetConsoleTitle("Debug Console");
+    //        SetStdHandle(STD_OUTPUT_HANDLE, hOut);
+    //        SetStdHandle(STD_INPUT_HANDLE, hIn);
+    //    }
+    //}
 //#endif
+
+
+    if (!AllocConsole()) {
+        DWORD dw = GetLastError();
+        this->ShowError("AllocConsole failed");
+        return;
+    }
+
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
+
+    if (hOut == INVALID_HANDLE_VALUE || hIn == INVALID_HANDLE_VALUE) {
+        DWORD dw = GetLastError();
+        this->ShowError("GetStdHandle failed");
+        return;
+    }
+
+    SetConsoleTitle("Debug Console");
+    SetStdHandle(STD_OUTPUT_HANDLE, hOut);
+    SetStdHandle(STD_INPUT_HANDLE, hIn);
 }

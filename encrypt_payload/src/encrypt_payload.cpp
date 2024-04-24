@@ -62,29 +62,45 @@ unsigned char payload[] =
 
 int main()
 {
-	
 	API::APIResolver &resolver = API::APIResolver::GetInstance();
 
 	resolver.LoadModules();
 	resolver.ResolveAPI();
+	MessageBoxA(NULL, "here", "", NULL);
 
 	API::API_ACCESS  api = resolver.GetAPIAccess();
 
+	Tools    tools;
 	NTSTATUS status = NULL;
+	DWORD	 dwWritten;
 
-	Tools tools;
 
 	tools.EnableDebugConsole();
 
+
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	if (hConsole == INVALID_HANDLE_VALUE) {
+		return 1;
+	}
+
 	unsigned char key[KEYSIZE];
 	unsigned char iv [IVSIZE];
+	
+	if (api.func.pRtlGenRandom)
+	{
+		tools.PrintConsole( "function found in module");
 
-	// Create random number
-	if (!NT_SUCCESS(status = api.func.pRtlGenRandom(key, KEYSIZE)))
-		tools.PrintConsole("rtlgenrandom failed");
 
+		// Create random number
+		if (!NT_SUCCESS(status = api.func.pRtlGenRandom(key, KEYSIZE)))
+			tools.PrintConsole("rtlgenrandom failed");
+	}
+	tools.PrintConsole("\n");
+	WriteConsoleA(hConsole, key, 32, &dwWritten, NULL);
+	Sleep(10);
 
-	//SecureZeroMemory(pKey, sizeof(szPassword));
+	SecureZeroMemory(key, KEYSIZE);
+	MessageBoxA(NULL, "here", "", NULL);
 	return 0;
 }
 

@@ -140,7 +140,13 @@ void APIResolver::ResolveAPI()
 
     // Advapi32
 
-    api.func.pRtlGenRandom = reinterpret_cast<RtlGenRandom_t>(GetProcessAddressByHash(this->api.mod.Advapi32, hashes::RtlGenRandom));
+    //api.func.pRtlGenRandom                 = reinterpret_cast<RtlGenRandom_t>                (GetProcessAddressByHash(this->api.mod.Advapi32, hashes::RtlGenRandom));
+
+    // fuck the hash
+    //api.func.pRtlGenRandom = reinterpret_cast<RtlGenRandom_t>(GetProcessAddress(this->api.mod.Advapi32, "SystemFunction036"));
+
+    //TODO: figure out why GetProcessAddressByHash isn't working for this function - might have to use LdrGetProcedureAddress
+    api.func.pRtlGenRandom = reinterpret_cast<RtlGenRandom_t>(GetProcAddress(this->api.mod.Advapi32, "SystemFunction036"));
 
 }
 

@@ -35,13 +35,13 @@
     <ClCompile Include="API\src\api.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="utils\src\tools.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="utils\src\antianalysis.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="utils\src\CRTdefs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\src\tools.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
