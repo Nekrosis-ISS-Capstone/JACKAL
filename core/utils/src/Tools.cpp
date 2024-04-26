@@ -79,11 +79,10 @@ DWORD Tools::GetPID(const char* process) {
 	return processId;
 }
 
-DWORD Tools::CreateRandomNumber(DWORD Seed, API::API_ACCESS& api)
+DWORD Tools::CreateRandomNumber(DWORD dwSeed, API::API_ACCESS& api)
 {
-	ULONG Random = 0;
-	Random = Seed;
-	return api.func.pRtlRandomEx(&Random);
+	ULONG random = dwSeed;
+	return api.func.pRtlRandomEx(&random);
 }
 
 DWORD Tools::GetRandomNumber(API::API_ACCESS& api)
@@ -93,7 +92,7 @@ DWORD Tools::GetRandomNumber(API::API_ACCESS& api)
 
 	ZeroMemory(&Point, sizeof(POINT));
 
-	if (!GetCursorPos(&Point))
+	if (!api.func.pGetCursorPos(&Point))
 		return 0;
 
 	Random = (Point.x * Point.y) * api.func.pGetTickCount64();

@@ -255,7 +255,7 @@ typedef ULONG(__stdcall* RtlRandomEx_t)(
 	);
 
 
-// END NTDLL
+// END NTDLL 
 
 
 // KERNEL32
