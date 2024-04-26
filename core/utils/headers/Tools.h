@@ -17,6 +17,7 @@ public:
 	//void DisplayMessage(const char* message, ...);
 	void EnableDebugConsole();
 	void PrintConsole(const char *message);
+	void PrintConsole(DWORD value);
 
 	void ExitProgram(const char* message);
 

@@ -58,26 +58,6 @@ unsigned char payload[] =
 "\x05\xf1\x01\x44\xfd\x51\xf1\x1f\xf3\xdd\xfc\xc2\xc0\x46"
 "\x1c\xd7\xa5\x7b\x60\x05\x02\x26\xd5\x6c\x43";
 
-
-void PrintDword(DWORD value, HANDLE hConsole)
-{
-	char buffer[33];
-	buffer[32] = '\0';  // Null-terminate the string
-	int pos = 31;
-
-	// Convert the DWORD to a string
-	do {
-		buffer[pos] = '0' + (value % 10);
-		value /= 10;
-		pos--;
-	} while (value != 0);
-
-	// Write the string to the console
-	DWORD dwWritten;
-	WriteConsoleA(hConsole, buffer + pos + 1, 32 - pos - 1, &dwWritten, NULL);
-}
-
-
 int main()
 {
 	API::APIResolver &resolver = API::APIResolver::GetInstance();
@@ -91,7 +71,21 @@ int main()
 	NTSTATUS status = NULL;
 	DWORD	 dwWritten;
 
-	tools.EnableDebugConsole();
+	//tools.EnableDebugConsole();
+
+	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
+
+	if (!AllocConsole())
+		return 1;
+
+	if (hOut == INVALID_HANDLE_VALUE || hIn == INVALID_HANDLE_VALUE)
+		return 1;
+
+	//SetConsoleTitle("Debug Console");
+	SetStdHandle(STD_OUTPUT_HANDLE, hOut);
+	SetStdHandle(STD_INPUT_HANDLE, hIn);
+
 
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	if (hConsole == INVALID_HANDLE_VALUE) {
@@ -104,6 +98,22 @@ int main()
 	//ZeroMemory(key, KEYSIZE);
 	//ZeroMemory(iv , IVSIZE);
 
+	auto word = tools.GetRandomNumber(api);
+
+	//tools.PrintConsole(word);
+	tools.PrintConsole("heeee");
+
+	const char* message = "a";
+
+	DWORD dwCharsWritten = 0;
+
+	WriteConsoleA(hConsole, message, strlen(message), &dwCharsWritten, NULL);
+
+
+	Sleep(10);
+
+	SecureZeroMemory(key, KEYSIZE);
+	MessageBoxA(NULL, "end", "", NULL);
 
 	//if (api.func.pRtlRandomEx)
 	//{
@@ -134,20 +144,6 @@ int main()
 	//	}
 	//}
 
-
-
-
-	auto word = tools.GetRandomNumber(api);
-
-	for (auto& x : key)
-		x = static_cast<unsigned char*>(tools.GetRandomNumber(api));
-
-	tools.PrintConsole("\n");
-	PrintDword(word, hConsole);
-	Sleep(10);
-
-	SecureZeroMemory(key, KEYSIZE);
-	MessageBoxA(NULL, "end", "", NULL);
 	return 0;
 }
 

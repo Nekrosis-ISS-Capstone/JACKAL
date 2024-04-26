@@ -6,49 +6,38 @@
 
 void Tools::ShowError(const char* error)
 {
-#ifdef _DEBUG
+//#ifdef _DEBUG
     MessageBoxA(NULL, error, "Error", MB_ICONERROR | MB_OK);
-#endif // DEBUG
+//#endif // DEBUG
 }
 
-//void Logging::ShowError(const char* error, int errnum)
-//{
-//#ifdef _DEBUG
-//     Format the error message with the error number
-//    std::string errorMessage = std::string(error) + " " + std::to_string(errnum);
-//
-//     Display the error message using MessageBoxA
-//    MessageBoxA(NULL, errorMessage.c_str(), "Error", MB_ICONERROR | MB_OK);
-//#endif // DEBUG
-//}
-//void Logging::DisplayMessage(const char* format, ...)
-//{
-//#ifdef _DEBUG
-//    const int bufferSize = 512;
-//    char buffer[bufferSize];
-//
-//    va_list args;
-//    va_start(args, format);
-//    vsnprintf(buffer, bufferSize, format, args);
-//    va_end(args);
-//
-//    MessageBoxA(NULL, buffer, "Debug", MB_ICONINFORMATION | MB_OK);
-//#endif
-//}
-//
-//
 void Tools::PrintConsole(const char *message)
 {
 	DWORD  dwCharsWritten; // WriteConsole dependency 
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
 	if (hConsole != INVALID_HANDLE_VALUE) 
-	{
 		WriteConsoleA(hConsole, message, strlen(message), &dwCharsWritten, NULL);
-	}
 }
 
+void Tools::PrintConsole(DWORD value)
+{
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	DWORD dwWritten;
 
+	char buffer[33];
+	buffer[32] = '\0';  // Null-terminate the string
+	int pos = 31;
+
+	// Convert the DWORD to a string
+	do {
+		buffer[pos] = '0' + (value % 10);
+		value /= 10;
+		pos--;
+	} while (value != 0);
+
+	WriteConsoleA(hConsole, buffer + pos + 1, 32 - pos - 1, &dwWritten, NULL);
+}
 
 void Tools::ExitProgram(const char* message)
 {
@@ -56,13 +45,14 @@ void Tools::ExitProgram(const char* message)
     ExitProcess(-1);
 }
 
-DWORD Tools::GetPID(const char* process) {
-
+DWORD Tools::GetPID(const char* process) 
+{
 	API::APIResolver& resolver = API::APIResolver::GetInstance();
 	API::API_ACCESS api		   = resolver.GetAPIAccess();
 	
 	DWORD processId = 0;
 	HANDLE snapshot = api.func.pCreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
 	if (snapshot != INVALID_HANDLE_VALUE) {
 		PROCESSENTRY32 processEntry;
 		processEntry.dwSize = sizeof(PROCESSENTRY32);
@@ -73,7 +63,7 @@ DWORD Tools::GetPID(const char* process) {
 					break;
 				}
 			} while (api.func.pProcess32Next(snapshot, &processEntry));
-}
+		}
 		CloseHandle(snapshot);
 	}
 	return processId;
@@ -89,6 +79,10 @@ DWORD Tools::GetRandomNumber(API::API_ACCESS& api)
 {
 	ULONG Random;
 	POINT Point;
+	
+	if (true)
+		this->PrintConsole("fuck yu nigger");
+
 
 	ZeroMemory(&Point, sizeof(POINT));
 
@@ -100,37 +94,18 @@ DWORD Tools::GetRandomNumber(API::API_ACCESS& api)
 	return CreateRandomNumber(Random, api);
 }
 
-void Tools::EnableDebugConsole() {
-//#ifdef _DEBUG
-    //if (AllocConsole()) {
-    //    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    //    HANDLE hIn  = GetStdHandle(STD_INPUT_HANDLE);
-
-    //    if (hOut != INVALID_HANDLE_VALUE && hIn != INVALID_HANDLE_VALUE) {
-    //        SetConsoleTitle("Debug Console");
-    //        SetStdHandle(STD_OUTPUT_HANDLE, hOut);
-    //        SetStdHandle(STD_INPUT_HANDLE, hIn);
-    //    }
-    //}
-//#endif
-
-
-    if (!AllocConsole()) {
-        DWORD dw = GetLastError();
-        this->ShowError("AllocConsole failed");
-        return;
-    }
-
+void Tools::EnableDebugConsole()
+{
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
+    HANDLE hIn  = GetStdHandle(STD_INPUT_HANDLE);
 
-    if (hOut == INVALID_HANDLE_VALUE || hIn == INVALID_HANDLE_VALUE) {
-        DWORD dw = GetLastError();
-        this->ShowError("GetStdHandle failed");
+    if (!AllocConsole()) 
         return;
-    }
 
-    SetConsoleTitle("Debug Console");
+    if (hOut == INVALID_HANDLE_VALUE || hIn == INVALID_HANDLE_VALUE) 
+        return;
+   
+    //SetConsoleTitle("Debug Console");
     SetStdHandle(STD_OUTPUT_HANDLE, hOut);
     SetStdHandle(STD_INPUT_HANDLE, hIn);
 }
