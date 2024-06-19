@@ -1,4 +1,3 @@
-
 #include <utils/headers/tools.h>
 #include <functional>
 #include <iostream>
@@ -79,10 +78,6 @@ DWORD Tools::GetRandomNumber(API::API_ACCESS& api)
 {
 	ULONG Random;
 	POINT Point;
-	
-	if (true)
-		this->PrintConsole("fuck yu nigger");
-
 
 	ZeroMemory(&Point, sizeof(POINT));
 

